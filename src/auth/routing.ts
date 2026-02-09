@@ -13,7 +13,6 @@ export const DATE_PICKER_SCENARIO_IDS = [
   'dual-calendar',
   'month-year',
   'year-only',
-  'mobile-wheel',
 ] as const
 
 export type DatePickerScenarioId = (typeof DATE_PICKER_SCENARIO_IDS)[number]

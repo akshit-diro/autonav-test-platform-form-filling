@@ -20,7 +20,6 @@ import { FromToScenario } from './FromToScenario'
 import { DualCalendarScenario } from './DualCalendarScenario'
 import { MonthYearScenario } from './MonthYearScenario'
 import { YearOnlyScenario } from './YearOnlyScenario'
-import { MobileWheelScenario } from './MobileWheelScenario'
 import { InlineCalendarScenario } from './InlineCalendarScenario'
 
 /** Placeholder preset ids for data-testid and future behavior. */
@@ -221,7 +220,6 @@ export function ScenarioPage() {
   const isDualCalendar = scenarioId === 'dual-calendar'
   const isMonthYear = scenarioId === 'month-year'
   const isYearOnly = scenarioId === 'year-only'
-  const isMobileWheel = scenarioId === 'mobile-wheel'
   const isInlineCalendar = scenarioId === 'inline-calendar'
 
   return (

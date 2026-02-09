@@ -1,10 +1,26 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
+import { credentials } from '../../auth/credentials'
+import type { CredentialEntry } from '../../auth/credentials'
 import { UX_DELAYS } from '../../config/uxDelays'
 import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
 import { DomNoise, DomNoiseDecorativeIcon } from '../../components/DomNoise'
+
+function getAccessNote(username: string, entry: CredentialEntry): string {
+  if (entry.scenarioAgnostic) {
+    const count = entry.allowedScenarios.filter((s) => s !== 'admin').length
+    return `Scenario-agnostic; Statements → picker (${count} scenarios)`
+  }
+  return `Scenario-bound → ${entry.defaultScenario} only`
+}
+
+const credentialsList = Object.entries(credentials).map(([user, entry]) => ({
+  username: user,
+  password: entry.password,
+  accessNote: getAccessNote(user, entry),
+}))
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -101,6 +117,29 @@ export function LoginPage() {
           Sign in
         </button>
       </form>
+
+      <section className="login-credentials-table" aria-label="Test credentials" data-testid="credentials-table">
+        <h2 className="login-credentials-table__title">Test credentials</h2>
+        <p className="login-credentials-table__hint">Use any row to sign in. Post-login: Accounts. Statements behaviour depends on access type.</p>
+        <table className="login-credentials-table__table">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Password</th>
+              <th>Access type</th>
+            </tr>
+          </thead>
+          <tbody>
+            {credentialsList.map(({ username: u, password: p, accessNote }) => (
+              <tr key={u} data-testid={`credentials-row-${u}`}>
+                <td data-testid="cred-username">{u}</td>
+                <td data-testid="cred-password">{p}</td>
+                <td data-testid="cred-access">{accessNote}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </div>
   )
 }

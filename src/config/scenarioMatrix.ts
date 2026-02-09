@@ -38,11 +38,6 @@ export const scenarioMatrix: Record<string, Omit<ScenarioEntry, 'scenarioId'>> =
     displayName: 'Year only',
     description: 'Single year selector.',
   },
-  'mobile-wheel': {
-    route: `${STATEMENTS_PREFIX}/mobile-wheel`,
-    displayName: 'Mobile wheel',
-    description: 'Wheel-style picker for touch devices.',
-  },
   'inline-calendar': {
     route: `${STATEMENTS_PREFIX}/inline-calendar`,
     displayName: 'Inline calendar',

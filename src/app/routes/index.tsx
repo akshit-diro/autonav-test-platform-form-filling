@@ -1,12 +1,12 @@
 import { RouteObject } from 'react-router-dom'
 import { ProtectedRoute } from '../../auth/ProtectedRoute'
 import { ScenarioRouteGuard } from '../../auth/ScenarioRouteGuard'
+import { RedirectToDefaultScenario } from '../../auth/RedirectToDefaultScenario'
 import { HomePage } from './HomePage'
 import { LoginPage } from './LoginPage'
 import { NotAuthorizedPage } from './NotAuthorizedPage'
 import { AdminPage } from './AdminPage'
 import { ScenarioPage } from './ScenarioPage'
-import { StatementsPage } from './StatementsPage'
 import { ProfilePage } from './ProfilePage'
 
 export const routes: RouteObject[] = [
@@ -28,7 +28,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'statements',
-        element: <StatementsPage />,
+        element: <RedirectToDefaultScenario />,
       },
       {
         path: 'profile',
@@ -47,7 +47,7 @@ export const routes: RouteObject[] = [
     ],
   },
   {
-    path: '/scenario/:scenarioId',
+    path: '/statements/:scenarioId',
     element: <ScenarioRouteGuard />,
     children: [
       {

@@ -4,7 +4,7 @@ import { useAuth } from './useAuth'
 import { InactivityGuard } from './InactivityGuard'
 
 /**
- * Guards /scenario/:scenarioId routes.
+ * Guards /statements/:scenarioId routes.
  * User must be logged in and have scenarioId in allowedScenarios.
  * scenarioId must exist in scenarioMatrix.
  */
@@ -18,7 +18,7 @@ export function ScenarioRouteGuard() {
 
   const scenario = scenarioId ? getScenario(scenarioId) : undefined
   if (!scenario) {
-    return <Navigate to="/" replace />
+    return <Navigate to="/statements" replace />
   }
 
   if (!scenarioId || !allowedScenarios.includes(scenarioId)) {

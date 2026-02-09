@@ -1,17 +1,22 @@
 import { NavLink } from 'react-router-dom'
-
-const items = [
-  { to: '/', label: 'Accounts', end: true },
-  { to: '/statements', label: 'Statements', end: true },
-  { to: '/profile', label: 'Profile', end: true },
-] as const
+import { useAuth } from '../auth/useAuth'
+import { getDefaultRedirectForUser } from '../auth/routing'
 
 export function DashboardNav() {
+  const { user } = useAuth()
+  const statementsTo = getDefaultRedirectForUser(user ?? null)
+
+  const items = [
+    { to: '/', label: 'Accounts', end: true },
+    { to: statementsTo, label: 'Statements', end: false },
+    { to: '/profile', label: 'Profile', end: true },
+  ] as const
+
   return (
     <nav className="dashboard-nav" aria-label="Main" data-testid="dashboard-nav">
       <ul className="dashboard-nav__list">
         {items.map(({ to, label, end }) => (
-          <li key={to}>
+          <li key={label}>
             <NavLink
               to={to}
               end={end}

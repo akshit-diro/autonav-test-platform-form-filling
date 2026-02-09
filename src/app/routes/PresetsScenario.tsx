@@ -87,14 +87,19 @@ export function PresetsScenario() {
     return () => clearTimeout(t)
   }, [valid])
 
+  /** Apply a date range to state (updates startInput/endInput). */
   function applyRange(start: Date, end: Date) {
     setStartInput(formatDate(start))
     setEndInput(formatDate(end))
   }
 
+  /** Preset → state: apply range, hide custom calendar, clear custom selection. */
   async function handlePreset(id: PresetId) {
     const fn = presetFns[id]
     if (!fn) return
+    // Transition: selecting any preset (other than Custom) closes custom calendar and clears in-progress custom pick
+    setCustomOpen(false)
+    setPendingEnd(null)
     const { start, end } = fn()
     applyRange(start, end)
     await chaosDelay(stressConfig.uiDelayMs)
@@ -151,6 +156,7 @@ export function PresetsScenario() {
             {label}
           </button>
         ))}
+        {/* Custom range → state: only toggles calendar visibility; does not clear preset range. */}
         <button
           type="button"
           data-testid="preset-custom"
@@ -161,6 +167,7 @@ export function PresetsScenario() {
         </button>
       </div>
 
+      {/* Custom range calendar: visible only when customOpen; closed when any preset is selected (see handlePreset). */}
       {customOpen && (
         <div data-testid="calendar-placeholder" style={{ marginTop: '1rem' }}>
           <PickerContainer>

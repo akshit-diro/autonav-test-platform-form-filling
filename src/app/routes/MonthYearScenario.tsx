@@ -40,8 +40,8 @@ function initialMonthYearFromLeakage(): { year: number | ''; month: number | '' 
 }
 
 /**
- * Month & year picker. No day-level UI; selecting month resolves to full month range.
- * Validation applies (e.g. months with 31 days exceed max range).
+ * Month & year picker. No day-level UI; selecting a month resolves to full calendar month (startOfMonth → endOfMonth).
+ * No date-range length validation: a single month is always valid (28–31 days). PDF uses full month boundaries.
  */
 export function MonthYearScenario() {
   const [selectedYear, setSelectedYear] = useState<number | ''>(() => initialMonthYearFromLeakage().year)
@@ -64,7 +64,7 @@ export function MonthYearScenario() {
   const endInput = range ? formatDate(range.end) : ''
 
   const validationResult = useMemo(
-    () => validateRange(startInput, endInput),
+    () => validateRange(startInput, endInput, { skipMaxRange: true }),
     [startInput, endInput]
   )
   const resolvedStart = validationResult.range?.start ?? range?.start

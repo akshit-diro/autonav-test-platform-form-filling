@@ -18,6 +18,7 @@ export {
   type DateRangeValidationError,
   type DateRangeValidationResult,
   type NormalizedRange,
+  type ValidateRangeOptions,
 } from './types'
 export {
   last7Days,

@@ -10,39 +10,41 @@ export interface ScenarioEntry {
   description: string
 }
 
+const STATEMENTS_PREFIX = '/statements'
+
 export const scenarioMatrix: Record<string, Omit<ScenarioEntry, 'scenarioId'>> = {
   presets: {
-    route: '/scenario/presets',
+    route: `${STATEMENTS_PREFIX}/presets`,
     displayName: 'Presets',
     description: 'Date picker with preset ranges (e.g. Last 7 days, This month).',
   },
   'from-to': {
-    route: '/scenario/from-to',
+    route: `${STATEMENTS_PREFIX}/from-to`,
     displayName: 'From–To',
     description: 'Start and end date selection with linked validation.',
   },
   'dual-calendar': {
-    route: '/scenario/dual-calendar',
+    route: `${STATEMENTS_PREFIX}/dual-calendar`,
     displayName: 'Dual calendar',
     description: 'Two calendars side by side for range selection.',
   },
   'month-year': {
-    route: '/scenario/month-year',
+    route: `${STATEMENTS_PREFIX}/month-year`,
     displayName: 'Month & year',
     description: 'Month and year dropdowns only (no day picker).',
   },
   'year-only': {
-    route: '/scenario/year-only',
+    route: `${STATEMENTS_PREFIX}/year-only`,
     displayName: 'Year only',
     description: 'Single year selector.',
   },
   'mobile-wheel': {
-    route: '/scenario/mobile-wheel',
+    route: `${STATEMENTS_PREFIX}/mobile-wheel`,
     displayName: 'Mobile wheel',
     description: 'Wheel-style picker for touch devices.',
   },
   'inline-calendar': {
-    route: '/scenario/inline-calendar',
+    route: `${STATEMENTS_PREFIX}/inline-calendar`,
     displayName: 'Inline calendar',
     description: 'Calendar always visible inline (no popover).',
   },

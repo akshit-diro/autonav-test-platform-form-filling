@@ -49,7 +49,7 @@ function initialFyFromLeakage(): number | '' {
 
 /**
  * Year-only fiscal year picker. Single control; FY runs April–March.
- * No Jan–Dec assumption. Max-range validation applies (full FY exceeds 30 days).
+ * No date-range length validation: selecting a year/fiscal year is always valid. PDF covers full fiscal year.
  */
 export function YearOnlyScenario() {
   const [selectedFy, setSelectedFy] = useState<number | ''>(() => initialFyFromLeakage())
@@ -67,7 +67,7 @@ export function YearOnlyScenario() {
   const endInput = range ? formatDate(range.end) : ''
 
   const validationResult = useMemo(
-    () => validateRange(startInput, endInput),
+    () => validateRange(startInput, endInput, { skipMaxRange: true }),
     [startInput, endInput]
   )
   const resolvedStart = validationResult.range?.start ?? range?.start

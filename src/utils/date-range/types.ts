@@ -22,6 +22,12 @@ export interface NormalizedRange {
   end: Date
 }
 
+/** Options for validateRange(); used to isolate scenario-specific rules (e.g. Month/Year and Year-only: no max-range check). */
+export interface ValidateRangeOptions {
+  /** When true, do not apply MAX_RANGE_DAYS validation. Used by Month & Year and Year-only scenarios. */
+  skipMaxRange?: boolean
+}
+
 /**
  * Result of validateRange(). UI can use:
  * - valid: disable submit when false (e.g. <button disabled={!result.valid}>)

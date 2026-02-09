@@ -1,3 +1,4 @@
+import { startOfYear } from 'date-fns'
 import { isFutureDate } from './blockFuture'
 import { MAX_RANGE_DAYS } from './maxRange'
 import { normalizeRange, canNormalize } from './normalizeRange'
@@ -5,7 +6,15 @@ import {
   DATE_RANGE_ERROR_CODES,
   type DateRangeValidationResult,
   type DateRangeValidationError,
+  type ValidateRangeOptions,
 } from './types'
+
+/** True if range is YTD: start is Jan 1 of end's year and end is not in the future. YTD is allowed to exceed MAX_RANGE_DAYS. */
+function isYtdRange(start: Date, end: Date): boolean {
+  if (isFutureDate(end)) return false
+  const jan1 = startOfYear(end)
+  return start.getTime() === jan1.getTime()
+}
 
 type DateInput = Date | string | number
 
@@ -17,10 +26,16 @@ function daysBetween(start: Date, end: Date): number {
 /**
  * Validates a date range. No silent correction — all violations are returned as errors.
  * Rules: startDate <= endDate, endDate <= today, (endDate - startDate) <= 30 days.
+ * Exception: YTD (Jan 1 of end's year through end) is valid even when it exceeds 30 days.
+ * Option skipMaxRange: when true, max-range (30-day) check is skipped (Month & Year and Year-only scenarios).
  *
  * @returns Result with valid, errors (with code + message), errorCodes (for DOM), and range when parseable.
  */
-export function validateRange(start: DateInput, end: DateInput): DateRangeValidationResult {
+export function validateRange(
+  start: DateInput,
+  end: DateInput,
+  options?: ValidateRangeOptions
+): DateRangeValidationResult {
   const errors: DateRangeValidationError[] = []
 
   if (!canNormalize(start, end)) {
@@ -63,7 +78,8 @@ export function validateRange(start: DateInput, end: DateInput): DateRangeValida
   }
 
   const days = daysBetween(startDate, endDate)
-  if (days > MAX_RANGE_DAYS) {
+  // Skip max-range check when options.skipMaxRange (Month & Year: full month; Year-only: full fiscal year)
+  if (!options?.skipMaxRange && days > MAX_RANGE_DAYS && !isYtdRange(startDate, endDate)) {
     errors.push({
       code: DATE_RANGE_ERROR_CODES.RANGE_EXCEEDS_MAX,
       message: `Date range cannot exceed ${MAX_RANGE_DAYS} days.`,

@@ -10,6 +10,8 @@
   --bank-primary: #0d5c2e;
   --bank-primary-hover: #0a4a24;
   --bank-primary-disabled: #94a3b0;
+  /* Text on primary buttons (ensure contrast); themes can override. */
+  --bank-primary-text: #ffffff;
   --bank-error: #991b1b;
   --bank-error-bg: #fef2f2;
   --bank-radius: 4px;
@@ -323,28 +325,45 @@ body {
   color: var(--bank-text);
 }
 
-/* Dashboard – CTA to statements */
+/* Dashboard – CTA to statements (theme-aware; sufficient contrast) */
 .dashboard-cta {
   margin-bottom: 1.5rem;
 }
 
-.dashboard-cta__button {
-  display: inline-block;
+/* Scoped under .bank-app so we beat .bank-app a and keep button text visible */
+.bank-app .dashboard-cta__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
   padding: 0.625rem 1.25rem;
   font-size: 0.9375rem;
   font-weight: 500;
-  color: var(--bank-bg-elevated);
+  color: var(--bank-primary-text, var(--bank-bg-elevated));
   background-color: var(--bank-primary);
   border: 1px solid var(--bank-primary);
   border-radius: var(--bank-radius);
   text-decoration: none;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.dashboard-cta__button:hover {
+.bank-app .dashboard-cta__button:hover {
   background-color: var(--bank-primary-hover);
   border-color: var(--bank-primary-hover);
-  color: var(--bank-bg-elevated);
+  color: var(--bank-primary-text, var(--bank-bg-elevated));
+}
+
+.bank-app .dashboard-cta__button:focus-visible {
+  outline: 2px solid var(--bank-primary);
+  outline-offset: 2px;
+}
+
+.bank-app .dashboard-cta__button[aria-disabled="true"],
+.bank-app .dashboard-cta__button.is-disabled {
+  background-color: var(--bank-primary-disabled);
+  border-color: var(--bank-primary-disabled);
+  color: var(--bank-primary-text, var(--bank-bg-elevated));
+  cursor: not-allowed;
+  opacity: 0.9;
 }
 
 /* Dashboard – recent activity */

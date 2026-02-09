@@ -16,6 +16,7 @@ export function FlatpickrAdapter({
   inline = false,
   disabled = false,
   id,
+  placeholder,
   startDate,
   endDate = null,
   onChange,
@@ -48,8 +49,9 @@ export function FlatpickrAdapter({
     const fp = flatpickr(el, {
       mode: mode === 'range' ? 'range' : 'single',
       inline,
+      defaultDate: value,
       dateFormat: DATE_FORMAT_TO_FLATPICKR[appConfig.dateFormat] ?? 'Y-m-d',
-      disable: disabled ? [() => true] : undefined,
+      disable: disabled ? [() => true] : [],
       minDate: minDate ?? undefined,
       maxDate: maxDate ?? undefined,
       onChange: (dates: Date[]) => handleChange(dates),
@@ -75,6 +77,9 @@ export function FlatpickrAdapter({
     }
   }, [value])
 
+  const inputPlaceholder =
+    placeholder ?? (mode === 'range' ? 'Select start and end date' : 'Select date')
+
   return (
     <div className="picker-adapter picker-adapter--flatpickr" data-testid="picker-adapter-flatpickr">
       <input
@@ -82,7 +87,8 @@ export function FlatpickrAdapter({
         id={id}
         type="text"
         readOnly
-        className="picker-adapter__input"
+        placeholder={inputPlaceholder}
+        className="picker-adapter__input flatpickr-input"
         data-testid="flatpickr-input"
         data-input
       />

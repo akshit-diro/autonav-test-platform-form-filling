@@ -424,6 +424,111 @@ body {
   color: var(--bank-text-muted);
 }
 
+/* Statements picker – single matrix (rows = variants, columns = base cases) */
+.statements-picker-matrix-wrap {
+  overflow-x: auto;
+  margin-top: 0.5rem;
+}
+
+.statements-picker-table--matrix .statements-picker-table__row-header {
+  font-weight: 600;
+  background: var(--bank-bg-elevated);
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+
+.statements-picker-table--matrix .statements-picker-table__variant-header,
+.statements-picker-table--matrix .statements-picker-table__variant-cell {
+  min-width: 0;
+  max-width: 12rem;
+}
+
+.statements-picker-table__variant-name {
+  display: block;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.statements-picker-table--matrix tbody td a {
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline;
+}
+
+.statements-picker-table--matrix tbody td a:hover {
+  text-decoration: none;
+}
+
+/* Statements picker – base case legend */
+.statements-picker-legend {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bank-border-subtle);
+}
+
+.statements-picker-legend__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+  color: var(--bank-text);
+}
+
+.statements-picker-legend__list {
+  display: grid;
+  gap: 0.35rem 1.5rem;
+  grid-template-columns: auto 1fr;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.statements-picker-legend__item {
+  display: contents;
+}
+
+.statements-picker-legend__term {
+  margin: 0;
+  font-weight: 600;
+  color: var(--bank-text);
+}
+
+.statements-picker-legend__desc {
+  margin: 0;
+  color: var(--bank-text-muted);
+}
+
+.statements-picker-legend__desc strong {
+  color: var(--bank-text);
+}
+
+/* Statements picker – base-only section (DS4, DS5) */
+.statements-picker-base-only {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bank-border-subtle);
+}
+
+.statements-picker-base-only__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--bank-text);
+}
+
+.statements-picker-base-only__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 0.9375rem;
+}
+
+.statements-picker-base-only__list li {
+  margin-bottom: 0.25rem;
+}
+
+.statements-picker-base-only__name {
+  color: var(--bank-text-muted);
+}
+
 /* Dashboard – main nav */
 .dashboard-nav {
   display: flex;

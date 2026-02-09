@@ -961,3 +961,17 @@ body {
   padding: 1.5rem;
   max-width: 100%;
 }
+
+/* Picker adapter layout (variant layouts) */
+.picker-adapter {
+  margin: 0.5rem 0;
+}
+.picker-adapter__range {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.picker-adapter__input {
+  min-width: 10rem;
+}

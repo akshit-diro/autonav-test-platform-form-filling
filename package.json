@@ -10,12 +10,19 @@
   },
   "dependencies": {
     "date-fns": "^4.1.0",
+    "flatpickr": "^4.6.13",
+    "litepicker": "^2.0.12",
     "pdf-lib": "^1.17.1",
+    "pikaday": "^1.8.2",
     "react": "^18.3.1",
+    "react-datepicker": "^7.0.0",
+    "react-day-picker": "^9.13.1",
     "react-dom": "^18.3.1",
+    "react-flatpickr": "^4.0.11",
     "react-router-dom": "^7.0.1"
   },
   "devDependencies": {
+    "@types/pikaday": "^1.7.10",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",

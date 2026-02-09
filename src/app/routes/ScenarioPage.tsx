@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getScenario, getScenarioIdFromRoute } from '../../config/scenarioMatrix'
+import { isScenarioEnabled } from '../../config/scenarioFlags'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { appConfig } from '../../config/appConfig'
 import { stressConfig } from '../../config/stressConfig'
@@ -24,6 +25,7 @@ import { DualCalendarScenario } from './DualCalendarScenario'
 import { MonthYearScenario } from './MonthYearScenario'
 import { YearOnlyScenario } from './YearOnlyScenario'
 import { InlineCalendarScenario } from './InlineCalendarScenario'
+import { PickerVariantScene } from './picker-variants'
 
 /** Placeholder preset ids for data-testid and future behavior. */
 const PRESETS = [
@@ -216,8 +218,9 @@ export function ScenarioPage() {
       ? getScenarioIdFromRoute(picker, baseScenario)
       : paramScenarioId ?? undefined
   const scenario = effectiveScenarioId ? getScenario(effectiveScenarioId) : undefined
+  const scenarioDisabled = effectiveScenarioId != null && !isScenarioEnabled(effectiveScenarioId)
 
-  if (!scenario) {
+  if (!scenario || scenarioDisabled) {
     return (
       <DashboardLayout contentClassName="page--statements">
         <h1>Download statements</h1>
@@ -249,7 +252,10 @@ export function ScenarioPage() {
       {isMonthYear && <MonthYearScenario />}
       {isYearOnly && <YearOnlyScenario />}
       {isInlineCalendar && <InlineCalendarScenario />}
-      {!isPresets && !isFromTo && !isDualCalendar && !isMonthYear && !isYearOnly && !isInlineCalendar && (
+      {isPickerVariant && effectiveScenarioId && (
+        <PickerVariantScene scenarioId={effectiveScenarioId} />
+      )}
+      {!isPresets && !isFromTo && !isDualCalendar && !isMonthYear && !isYearOnly && !isInlineCalendar && !isPickerVariant && (
         <GenericScenarioContent />
       )}
 

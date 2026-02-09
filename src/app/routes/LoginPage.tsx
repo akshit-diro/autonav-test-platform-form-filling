@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { credentials } from '../../auth/credentials'
 import type { CredentialEntry } from '../../auth/credentials'
-import { scenarioMatrix, scenarioIds } from '../../config/scenarioMatrix'
+import { scenarioMatrix } from '../../config/scenarioMatrix'
+import { enabledBaseScenarioIds } from '../../config/scenarioFlags'
 import { UX_DELAYS } from '../../config/uxDelays'
 import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
@@ -29,7 +30,7 @@ const adminUserList = ADMIN_USERNAMES.filter((u) => credentials[u]).map((usernam
   }
 })
 
-const scenarioList = scenarioIds.map((scenarioId, index) => {
+const scenarioList = enabledBaseScenarioIds.map((scenarioId, index) => {
   const entry = scenarioMatrix[scenarioId]
   const cred = credentials[scenarioId]
   return {

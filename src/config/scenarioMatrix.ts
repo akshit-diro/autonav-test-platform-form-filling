@@ -108,12 +108,16 @@ const PICKER_SLUG_TO_CODE: Record<string, string> = Object.fromEntries(
   PICKER_REGISTRY.map((p) => [p.routeSlug, p.code])
 )
 
-/** Generated picker-variant scenarios: DS<n>-<PICKER>. Not added to scenarioMatrix to keep base matrix unchanged. */
+/** Base slugs that have picker variants (excludes month-year and year-only; those are dropdown-only and have no logical picker variant). */
+const BASE_SLUGS_WITH_PICKER_VARIANTS = ['presets', 'from-to', 'dual-calendar', 'inline-calendar'] as const
+
+/** Generated picker-variant scenarios: DS<n>-<PICKER> for DS1, DS2, DS3, DS6 only. DS4/DS5 (month-year, year-only) have no variants. */
 function buildScenarioVariants(): Record<string, Omit<ScenarioEntry, 'scenarioId'>> {
   const variants: Record<string, Omit<ScenarioEntry, 'scenarioId'>> = {}
   const baseEntries = scenarioMatrix as Record<string, { displayName: string }>
 
-  BASE_SCENARIO_IDS.forEach((baseSlug, index) => {
+  BASE_SLUGS_WITH_PICKER_VARIANTS.forEach((baseSlug) => {
+    const index = BASE_SCENARIO_IDS.indexOf(baseSlug)
     const baseDs = `DS${index + 1}`
     const baseDisplayName = baseEntries[baseSlug]?.displayName ?? baseSlug
 

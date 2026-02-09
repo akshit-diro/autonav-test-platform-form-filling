@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useParams } from 'react-router-dom'
 import { getScenario, getScenarioIdFromRoute } from '../config/scenarioMatrix'
+import { isScenarioEnabled } from '../config/scenarioFlags'
 import { useAuth } from './useAuth'
 import { InactivityGuard } from './InactivityGuard'
 
@@ -26,7 +27,7 @@ export function ScenarioRouteGuard() {
   }
 
   const scenario = effectiveScenarioId ? getScenario(effectiveScenarioId) : undefined
-  if (!scenario) {
+  if (!scenario || (effectiveScenarioId && !isScenarioEnabled(effectiveScenarioId))) {
     return <Navigate to="/statements" replace />
   }
 

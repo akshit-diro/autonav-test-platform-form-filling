@@ -8,6 +8,13 @@ export {
   PICKER_REGISTRY,
 } from './scenarioMatrix'
 export type { ScenarioEntry, ScenarioMetadata, ScenarioAuth } from './scenarioMatrix'
+export {
+  scenarioIdToEnvKey,
+  getScenarioEnabledEnvKey,
+  isScenarioEnabled,
+  enabledBaseScenarioIds,
+  enabledAllScenarioIds,
+} from './scenarioFlags'
 export { appConfig } from './appConfig'
 export type { AppConfig } from './appConfig'
 export { stressConfig } from './stressConfig'

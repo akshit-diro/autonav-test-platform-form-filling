@@ -135,34 +135,26 @@ export function MobileWheelScenario() {
   )
 
   const activeDate = activeField === 'start' ? startDate : endDate
-  const setActiveDate = activeField === 'start' ? setStartDate : setEndDate
+  const setActiveDateRef = useRef<(fn: (prev: DateParts) => DateParts) => void>(() => {})
+  setActiveDateRef.current = activeField === 'start' ? setStartDate : setEndDate
 
-  const handleDaySelect = useCallback(
-    (v: number) => {
-      setActiveDate((prev) => ({ ...prev, day: clampDay(v, prev.month, prev.year) }))
-    },
-    [activeField]
-  )
-  const handleMonthSelect = useCallback(
-    (v: number) => {
-      setActiveDate((prev) => ({
-        ...prev,
-        month: v,
-        day: clampDay(prev.day, v, prev.year),
-      }))
-    },
-    [activeField]
-  )
-  const handleYearSelect = useCallback(
-    (v: number) => {
-      setActiveDate((prev) => ({
-        ...prev,
-        year: v,
-        day: clampDay(prev.day, prev.month, v),
-      }))
-    },
-    [activeField]
-  )
+  const handleDaySelect = useCallback((v: number) => {
+    setActiveDateRef.current((prev) => ({ ...prev, day: clampDay(v, prev.month, prev.year) }))
+  }, [])
+  const handleMonthSelect = useCallback((v: number) => {
+    setActiveDateRef.current((prev) => ({
+      ...prev,
+      month: v,
+      day: clampDay(prev.day, v, prev.year),
+    }))
+  }, [])
+  const handleYearSelect = useCallback((v: number) => {
+    setActiveDateRef.current((prev) => ({
+      ...prev,
+      year: v,
+      day: clampDay(prev.day, prev.month, v),
+    }))
+  }, [])
 
   const hasValidationErrors = !valid && validationResult.errors.length > 0
   const showValidationErrors = useValidationErrorDisplay(hasValidationErrors)

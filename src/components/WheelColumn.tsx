@@ -28,6 +28,7 @@ export function WheelColumn({
 }: WheelColumnProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const scrollEndTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastSyncedValueRef = useRef<number | null>(null)
 
   const padding = (CONTAINER_HEIGHT - ROW_HEIGHT) / 2
 
@@ -52,6 +53,8 @@ export function WheelColumn({
   useEffect(() => {
     const el = scrollRef.current
     if (!el || options.length === 0) return
+    if (lastSyncedValueRef.current !== null && lastSyncedValueRef.current === selectedValue) return
+    lastSyncedValueRef.current = selectedValue
     const i = options.findIndex((o) => o.value === selectedValue)
     const index = i >= 0 ? i : 0
     el.scrollTop = scrollTopFromIndex(index)

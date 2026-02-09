@@ -365,7 +365,6 @@ export const PICKER_CONFIGS: PickerConfig[] = [
     openStrategy: {
       type: 'click_trigger',
       triggerSelector: '.dx-datebox .dx-texteditor-input',
-      fallbackTriggerSelector: '.dx-datebox',
     },
     setDateStrategy: {
       type: 'click_day',
@@ -376,27 +375,6 @@ export const PICKER_CONFIGS: PickerConfig[] = [
     validateStrategy: { type: 'input_has_value', inputSelector: '.dx-datebox .dx-texteditor-input' },
     supportedBaseScenarios: ALL_BASE_SCENARIOS,
     documentation: 'DevExpress Date Editor: Renders in overlay. Class prefix "dx-". Supports range and different modes.',
-  },
-  {
-    pickerType: 'CARBON',
-    detection: {
-      selectors: ['.flatpickr-carbon', '.bx--date-picker', '[class*="bx--date-picker"]'],
-      classPatterns: ['bx--date-picker', 'flatpickr-carbon'],
-    },
-    openStrategy: {
-      type: 'focus_input',
-      triggerSelector: '.bx--date-picker__input',
-      notes: 'Carbon uses Flatpickr under the hood; may have .flatpickr-carbon or bx--date-picker.',
-    },
-    setDateStrategy: {
-      type: 'click_day',
-      daySelector: '.flatpickr-day:not(.flatpickr-disabled)',
-      inputFormat: 'yyyy-MM-dd',
-    },
-    confirmStrategy: { type: 'none' },
-    validateStrategy: { type: 'input_has_value', inputSelector: '.bx--date-picker__input' },
-    supportedBaseScenarios: ALL_BASE_SCENARIOS,
-    documentation: 'Carbon Design DatePicker (IBM): Based on Flatpickr with Carbon styling. Detect .bx--date-picker or Flatpickr wrapper.',
   },
   {
     pickerType: 'CLARITY',
@@ -439,27 +417,6 @@ export const PICKER_CONFIGS: PickerConfig[] = [
     validateStrategy: { type: 'input_has_value', inputSelector: '.ui.calendar input' },
     supportedBaseScenarios: ALL_BASE_SCENARIOS,
     documentation: 'Semantic UI Calendar: Uses custom or third-party calendar. Classes: .ui.calendar; table for grid.',
-  },
-  {
-    pickerType: 'MOBISCROLL',
-    detection: {
-      selectors: ['.mbsc-datepicker', '.mbsc-widget', '[class*="mbsc-"]'],
-      classPatterns: ['mbsc-datepicker', 'mbsc-widget'],
-    },
-    openStrategy: {
-      type: 'click_trigger',
-      triggerSelector: '.mbsc-input',
-      notes: 'Mobile-first; may show as wheel picker or calendar. Desktop: calendar popup.',
-    },
-    setDateStrategy: {
-      type: 'click_day',
-      daySelector: '.mbsc-calendar-day:not(.mbsc-disabled)',
-      inputFormat: 'yyyy-MM-dd',
-    },
-    confirmStrategy: { type: 'click_apply', buttonSelector: '.mbsc-popup-button.mbsc-primary' },
-    validateStrategy: { type: 'input_has_value', inputSelector: '.mbsc-input' },
-    supportedBaseScenarios: ALL_BASE_SCENARIOS,
-    documentation: 'Mobiscroll Date Picker: Mobile vs desktop rendering differs (wheel vs calendar). Detect .mbsc-* in active root.',
   },
   {
     pickerType: 'IONIC',

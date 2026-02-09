@@ -21,10 +21,8 @@ export type PickerType =
   | 'KENDO'
   | 'SYNCFUSION'
   | 'DEVEXPRESS'
-  | 'CARBON'
   | 'CLARITY'
   | 'SEMANTIC_UI'
-  | 'MOBISCROLL'
   | 'IONIC'
 
 /** Base scenario ids (DS1–DS6) this picker variant can support. */

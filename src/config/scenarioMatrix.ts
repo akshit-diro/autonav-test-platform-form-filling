@@ -96,16 +96,19 @@ export const PICKER_REGISTRY: ReadonlyArray<{ code: string; displayName: string;
   { code: 'KENDO', displayName: 'Kendo UI Datepicker', routeSlug: 'kendo-datepicker' },
   { code: 'SYNCFUSION', displayName: 'Syncfusion DatePicker', routeSlug: 'syncfusion-datepicker' },
   { code: 'DEVEXPRESS', displayName: 'DevExpress Date Editor', routeSlug: 'devexpress-date-editor' },
-  { code: 'CARBON', displayName: 'Carbon Design DatePicker (IBM)', routeSlug: 'carbon-datepicker' },
   { code: 'CLARITY', displayName: 'Clarity Datepicker (VMware)', routeSlug: 'clarity-datepicker' },
   { code: 'SEMANTIC_UI', displayName: 'Semantic UI Calendar', routeSlug: 'semantic-ui-calendar' },
-  { code: 'MOBISCROLL', displayName: 'Mobiscroll Date Picker', routeSlug: 'mobiscroll-datepicker' },
   { code: 'IONIC', displayName: 'Ionic DateTime Picker', routeSlug: 'ionic-datetime-picker' },
 ]
 
 /** Route slug → picker code (for resolving /statements/:picker/:baseScenario). */
 const PICKER_SLUG_TO_CODE: Record<string, string> = Object.fromEntries(
   PICKER_REGISTRY.map((p) => [p.routeSlug, p.code])
+)
+
+/** Picker code → numeric variant ID (1-based index in PICKER_REGISTRY) for test scenario IDs. */
+const PICKER_CODE_TO_NUMERIC_ID: Record<string, number> = Object.fromEntries(
+  PICKER_REGISTRY.map((p, i) => [p.code, i + 1])
 )
 
 /** Base slugs that have picker variants (excludes month-year and year-only; those are dropdown-only and have no logical picker variant). */
@@ -157,6 +160,23 @@ export function getScenario(scenarioId: string): ScenarioEntry | undefined {
   const variant = scenarioVariantMatrix[scenarioId]
   if (variant) return { scenarioId, ...variant }
   return undefined
+}
+
+/**
+ * Test scenario ID format: DS<base_case>.<variant_id>.
+ * Base: variant_id = 0 → DS1.0, DS2.0, …, DS6.0.
+ * Variant: DS1-FLATPICKR → DS1.1 (variant_id is numeric, 1-based picker index).
+ */
+export function getTestScenarioId(scenarioId: string): string {
+  const baseIndex = scenarioIds.indexOf(scenarioId)
+  if (baseIndex >= 0) return `DS${baseIndex + 1}.0`
+  const variantMatch = scenarioId.match(/^(DS\d+)-(.+)$/)
+  if (variantMatch) {
+    const [, baseDs, pickerCode] = variantMatch
+    const numericId = PICKER_CODE_TO_NUMERIC_ID[pickerCode ?? '']
+    return numericId != null ? `${baseDs}.${numericId}` : `${baseDs}.${pickerCode}`
+  }
+  return scenarioId
 }
 
 /** Resolve variant scenario id from route params /statements/:picker/:baseScenario. */

@@ -53,28 +53,40 @@ export function PrimeNGDatepickerAdapter({
       <div className="picker-adapter picker-adapter--primeng" data-testid="picker-adapter-primeng">
         {inline ? (
           <div className="picker-adapter__range" style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-            <Calendar
-              value={startDate}
-              onChange={(e: FormEvent<Date>) => onChange(e.value ?? null, endDate ?? null)}
-              inline
-              disabled={disabled}
-              dateFormat={dateFormat}
-              minDate={minDate ?? undefined}
-              maxDate={maxDate ?? undefined}
-              data-testid="primeng-datepicker-start"
-              inputClassName="p-datepicker-input"
-            />
-            <Calendar
-              value={endDate}
-              onChange={(e: FormEvent<Date>) => onChange(startDate, e.value ?? null)}
-              inline
-              disabled={disabled}
-              dateFormat={dateFormat}
-              minDate={startDate ?? minDate ?? undefined}
-              maxDate={maxDate ?? undefined}
-              data-testid="primeng-datepicker-end"
-              inputClassName="p-datepicker-input"
-            />
+            <div className="picker-adapter__range-item" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span className="picker-adapter__range-label" aria-hidden="true">
+                Start date
+              </span>
+              <Calendar
+                value={startDate}
+                onChange={(e: FormEvent<Date>) => onChange(e.value ?? null, endDate ?? null)}
+                inline
+                disabled={disabled}
+                dateFormat={dateFormat}
+                minDate={minDate ?? undefined}
+                maxDate={maxDate ?? undefined}
+                data-testid="primeng-datepicker-start"
+                inputClassName="p-datepicker-input"
+                aria-label="Start date"
+              />
+            </div>
+            <div className="picker-adapter__range-item" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <span className="picker-adapter__range-label" aria-hidden="true">
+                End date
+              </span>
+              <Calendar
+                value={endDate}
+                onChange={(e: FormEvent<Date>) => onChange(startDate, e.value ?? null)}
+                inline
+                disabled={disabled}
+                dateFormat={dateFormat}
+                minDate={startDate ?? minDate ?? undefined}
+                maxDate={maxDate ?? undefined}
+                data-testid="primeng-datepicker-end"
+                inputClassName="p-datepicker-input"
+                aria-label="End date"
+              />
+            </div>
           </div>
         ) : (
           <div className="picker-adapter__range" style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>

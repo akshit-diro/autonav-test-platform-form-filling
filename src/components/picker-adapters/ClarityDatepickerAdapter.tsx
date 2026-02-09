@@ -17,9 +17,9 @@ import type { PickerAdapterProps } from './types'
 import { formatDate, getDateLocale, getWeekStartsOn } from '../../config/dateLocale'
 
 /**
- * Angular Material Datepicker adapter.
- * Renders DOM that matches Angular Material selectors (.mat-datepicker-content, .mat-calendar,
- * input[matDatepicker], .mat-calendar-body-cell) for picker detection. No native/HTML datepicker fallback.
+ * Clarity Datepicker (VMware) adapter.
+ * Renders DOM that matches Clarity selectors (.clr-datepicker, .clr-input, input.clr-date-input, .day)
+ * for picker detection. No fallback to native or other datepicker.
  */
 
 const WEEK_DAYS = 7
@@ -38,7 +38,7 @@ function buildCalendarDays(month: Date, weekStartsOn: 0 | 1): Date[] {
   return days
 }
 
-function MatCalendarBody({
+function ClarityCalendarBody({
   month,
   onMonthChange,
   startDate,
@@ -86,9 +86,9 @@ function MatCalendarBody({
   }, [days])
 
   return (
-    <div className="mat-calendar" style={{ fontFamily: 'sans-serif', fontSize: 14 }}>
+    <div className="clr-datepicker-container" style={{ fontFamily: 'sans-serif', fontSize: 14 }}>
       <div
-        className="mat-calendar-header"
+        className="clr-datepicker-header"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -99,14 +99,14 @@ function MatCalendarBody({
       >
         <button
           type="button"
-          className="mat-calendar-previous-button"
+          className="clr-datepicker-prev"
           aria-label="Previous month"
           onClick={() => onMonthChange(subMonths(month, 1))}
           style={{
             minWidth: 32,
             minHeight: 32,
             padding: 0,
-            border: '1px solid #e0e0e0',
+            border: '1px solid #ccc',
             borderRadius: 4,
             background: '#fff',
             cursor: 'pointer',
@@ -116,19 +116,19 @@ function MatCalendarBody({
         >
           ‹
         </button>
-        <div className="mat-calendar-period-button" style={{ fontWeight: 600 }}>
+        <div className="clr-datepicker-month-year" style={{ fontWeight: 600 }}>
           {format(month, 'MMMM yyyy', { locale })}
         </div>
         <button
           type="button"
-          className="mat-calendar-next-button"
+          className="clr-datepicker-next"
           aria-label="Next month"
           onClick={() => onMonthChange(addMonths(month, 1))}
           style={{
             minWidth: 32,
             minHeight: 32,
             padding: 0,
-            border: '1px solid #e0e0e0',
+            border: '1px solid #ccc',
             borderRadius: 4,
             background: '#fff',
             cursor: 'pointer',
@@ -139,88 +139,73 @@ function MatCalendarBody({
           ›
         </button>
       </div>
-      <div className="mat-calendar-body">
-        <div className="mat-calendar-body-label" aria-hidden style={{ display: 'none' }}>
-          {format(month, 'MMMM yyyy', { locale })}
-        </div>
-        <table className="mat-calendar-table" role="grid" style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              {weekHeaders.map((h) => (
-                <th
-                  key={h}
-                  className="mat-calendar-body-label"
-                  style={{ padding: '4px 2px', fontSize: 12, fontWeight: 500, color: '#666', textAlign: 'center' }}
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {weeks.map((week, wi) => (
-              <tr key={wi}>
-                {week.map((d) => {
-                  const isDisabled = isDayDisabled(d)
-                  const inRange =
-                    mode === 'range' &&
-                    startDate &&
-                    (endDate
-                      ? (d.getTime() >= startDate.getTime() && d.getTime() <= endDate.getTime())
-                      : isSameDay(d, startDate))
-                  const isStart = startDate && isSameDay(d, startDate)
-                  const isEnd = endDate && isSameDay(d, endDate)
-                  const selected = (mode === 'single' && startDate && isSameDay(d, startDate)) || isStart || isEnd
-                  return (
-                    <td
-                      key={d.getTime()}
-                      className={
-                        'mat-calendar-body-cell' +
-                        (isDisabled ? ' mat-calendar-body-disabled' : '') +
-                        (selected ? ' mat-calendar-body-selected' : '') +
-                        (inRange ? ' mat-calendar-body-range' : '')
-                      }
-                      role="gridcell"
-                      style={{ padding: 2, textAlign: 'center' }}
-                    >
-                      <div
-                        className="mat-calendar-body-cell-content"
-                        onClick={() => !isDisabled && onSelectDay(d)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault()
-                            if (!isDisabled) onSelectDay(d)
-                          }
-                        }}
-                        tabIndex={isDisabled ? -1 : 0}
-                        role="button"
-                        style={{
-                          minWidth: 32,
-                          minHeight: 32,
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: 4,
-                          cursor: isDisabled ? 'default' : 'pointer',
-                          background: selected ? '#1976d2' : inRange ? 'rgba(25,118,210,0.12)' : 'transparent',
-                          color: isDisabled ? '#999' : selected ? '#fff' : undefined,
-                        }}
-                      >
-                        {format(d, 'd')}
-                      </div>
-                    </td>
-                  )
-                })}
-              </tr>
+      <table className="clr-datepicker-calendar" role="grid" style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <thead>
+          <tr>
+            {weekHeaders.map((h) => (
+              <th
+                key={h}
+                className="clr-datepicker-weekday"
+                style={{ padding: '4px 2px', fontSize: 12, fontWeight: 500, color: '#666', textAlign: 'center' }}
+              >
+                {h}
+              </th>
             ))}
-          </tbody>
-        </table>
-      </div>
+          </tr>
+        </thead>
+        <tbody>
+          {weeks.map((week, wi) => (
+            <tr key={wi}>
+              {week.map((d) => {
+                const isDisabled = isDayDisabled(d)
+                const inRange =
+                  mode === 'range' &&
+                  startDate &&
+                  (endDate
+                    ? (d.getTime() >= startDate.getTime() && d.getTime() <= endDate.getTime())
+                    : isSameDay(d, startDate))
+                const isStart = startDate && isSameDay(d, startDate)
+                const isEnd = endDate && isSameDay(d, endDate)
+                const selected = (mode === 'single' && startDate && isSameDay(d, startDate)) || isStart || isEnd
+                return (
+                  <td key={d.getTime()} style={{ padding: 2, textAlign: 'center' }}>
+                    <div
+                      className="day"
+                      role="button"
+                      onClick={() => !isDisabled && onSelectDay(d)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          if (!isDisabled) onSelectDay(d)
+                        }
+                      }}
+                      tabIndex={isDisabled ? -1 : 0}
+                      style={{
+                        minWidth: 32,
+                        minHeight: 32,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 4,
+                        cursor: isDisabled ? 'default' : 'pointer',
+                        background: selected ? '#007cba' : inRange ? 'rgba(0,124,186,0.15)' : 'transparent',
+                        color: isDisabled ? '#999' : selected ? '#fff' : undefined,
+                      }}
+                    >
+                      {format(d, 'd')}
+                    </div>
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   )
 }
 
-function SingleOrRangePanel({
+function ClaritySingleOrRangePanel({
   mode,
   inline,
   startDate,
@@ -295,11 +280,11 @@ function SingleOrRangePanel({
 
   const content = (
     <div
-      className="mat-datepicker-content"
+      className="clr-datepicker-panel"
       role="dialog"
       aria-modal="true"
       ref={panelRef}
-      data-testid="angular-material-datepicker-panel"
+      data-testid="clarity-datepicker-panel"
       style={{
         position: inline ? 'relative' : 'absolute',
         top: inline ? undefined : '100%',
@@ -307,14 +292,14 @@ function SingleOrRangePanel({
         marginTop: inline ? 0 : 4,
         zIndex: 9999,
         background: '#fff',
-        border: '1px solid #e0e0e0',
+        border: '1px solid #ccc',
         borderRadius: 4,
         padding: 12,
         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
         minWidth: 280,
       }}
     >
-      <MatCalendarBody
+      <ClarityCalendarBody
         month={viewMonth}
         onMonthChange={setViewMonth}
         startDate={startDate}
@@ -337,15 +322,14 @@ function SingleOrRangePanel({
   }
 
   return (
-    <div className="picker-adapter__mat-wrapper" style={{ position: 'relative' }}>
+    <div className="clr-datepicker datepicker" style={{ position: 'relative' }}>
       <input
         ref={(el) => {
           (openTriggerRef as React.MutableRefObject<HTMLInputElement | null>).current = el
-          if (el) el.setAttribute('matDatepicker', '')
         }}
         type="text"
         id={id}
-        className="mat-datepicker-input"
+        className="clr-input clr-date-input"
         value={displayValue}
         readOnly
         placeholder={placeholder}
@@ -354,13 +338,13 @@ function SingleOrRangePanel({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         onFocus={() => setOpen(true)}
-        data-testid="angular-material-datepicker-input"
+        data-testid="clarity-datepicker-input"
         style={{
           display: 'block',
           width: '100%',
           minWidth: 200,
           padding: '8px 12px',
-          border: '1px solid #e0e0e0',
+          border: '1px solid #ccc',
           borderRadius: 4,
           fontSize: 14,
         }}
@@ -370,7 +354,7 @@ function SingleOrRangePanel({
   )
 }
 
-export function AngularMaterialAdapter(props: PickerAdapterProps) {
+export function ClarityDatepickerAdapter(props: PickerAdapterProps) {
   const {
     mode,
     inline = false,
@@ -390,11 +374,11 @@ export function AngularMaterialAdapter(props: PickerAdapterProps) {
   if (mode === 'range' && !inline) {
     return (
       <div
-        className="picker-adapter picker-adapter--angular-material"
-        data-testid="picker-adapter-angular-material"
+        className="picker-adapter picker-adapter--clarity"
+        data-testid="picker-adapter-clarity"
       >
         <div className="picker-adapter__range" style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
-          <SingleOrRangePanel
+          <ClaritySingleOrRangePanel
             {...props}
             mode="range"
             startDate={startDate}
@@ -403,12 +387,12 @@ export function AngularMaterialAdapter(props: PickerAdapterProps) {
             disabled={disabled}
             minDate={minDate}
             maxDate={maxDate}
-            id={id}
+            id={id ? `${id}-start` : undefined}
             placeholder={placeholder ?? 'Start date'}
             openTriggerRef={startTriggerRef}
             rangeRole="start"
           />
-          <SingleOrRangePanel
+          <ClaritySingleOrRangePanel
             {...props}
             mode="range"
             startDate={startDate}
@@ -417,6 +401,7 @@ export function AngularMaterialAdapter(props: PickerAdapterProps) {
             disabled={disabled}
             minDate={startDate ?? minDate}
             maxDate={maxDate}
+            id={id ? `${id}-end` : undefined}
             placeholder={placeholder ?? 'End date'}
             openTriggerRef={endTriggerRef}
             rangeRole="end"
@@ -428,10 +413,10 @@ export function AngularMaterialAdapter(props: PickerAdapterProps) {
 
   return (
     <div
-      className="picker-adapter picker-adapter--angular-material"
-      data-testid="picker-adapter-angular-material"
+      className="picker-adapter picker-adapter--clarity"
+      data-testid="picker-adapter-clarity"
     >
-      <SingleOrRangePanel
+      <ClaritySingleOrRangePanel
         {...props}
         mode={mode}
         inline={inline}

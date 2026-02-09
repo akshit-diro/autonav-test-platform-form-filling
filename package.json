@@ -9,10 +9,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@carbon/react": "^1.100.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@ionic/react": "^8.0.0",
     "@mui/material": "^6.0.0",
     "@mui/x-date-pickers": "^8.0.0",
+    "@progress/kendo-react-dateinputs": "^10.2.0",
+    "@progress/kendo-theme-default": "^10.6.0",
     "@syncfusion/ej2-react-calendars": "^32.2.3",
     "air-datepicker": "^3.6.0",
     "antd": "^5.22.0",
@@ -20,6 +24,8 @@
     "date-fns": "^4.1.0",
     "daterangepicker": "^3.1.0",
     "dayjs": "^1.11.13",
+    "devextreme": "^24.2.0",
+    "devextreme-react": "^24.2.0",
     "flatpickr": "^4.6.13",
     "jquery": "^3.7.1",
     "jquery-ui-dist": "^1.13.3",
@@ -27,16 +33,14 @@
     "moment": "^2.30.1",
     "pdf-lib": "^1.17.1",
     "pikaday": "^1.8.2",
-    "primereact": "^10.9.0",
     "primeicons": "^7.0.0",
+    "primereact": "^10.9.0",
     "react": "^18.3.1",
     "react-datepicker": "^7.0.0",
     "react-day-picker": "^9.13.1",
     "react-dom": "^18.3.1",
     "react-flatpickr": "^4.0.11",
-    "react-router-dom": "^7.0.1",
-    "@progress/kendo-react-dateinputs": "^10.2.0",
-    "@progress/kendo-theme-default": "^10.6.0"
+    "react-router-dom": "^7.0.1"
   },
   "devDependencies": {
     "@types/bootstrap-datepicker": "^1.6.6",

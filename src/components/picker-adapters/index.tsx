@@ -15,6 +15,9 @@ import { PrimeNGDatepickerAdapter } from './PrimeNGDatepickerAdapter'
 import { AngularMaterialAdapter } from './AngularMaterialAdapter'
 import { KendoDatepickerAdapter } from './KendoDatepickerAdapter'
 import { SyncfusionDatepickerAdapter } from './SyncfusionDatepickerAdapter'
+import { ClarityDatepickerAdapter } from './ClarityDatepickerAdapter'
+import { DevExpressDatepickerAdapter } from './DevExpressDatepickerAdapter'
+import { IonicDatetimeAdapter } from './IonicDatetimeAdapter'
 import { FallbackAdapter } from './FallbackAdapter'
 
 const PICKER_ADAPTER_MAP: Record<string, ComponentType<PickerAdapterProps>> = {
@@ -33,6 +36,9 @@ const PICKER_ADAPTER_MAP: Record<string, ComponentType<PickerAdapterProps>> = {
   ANGULAR_MATERIAL: AngularMaterialAdapter,
   KENDO: KendoDatepickerAdapter,
   SYNCFUSION: SyncfusionDatepickerAdapter,
+  CLARITY: ClarityDatepickerAdapter,
+  DEVEXPRESS: DevExpressDatepickerAdapter,
+  IONIC: IonicDatetimeAdapter,
 }
 
 export type PickerType = string
@@ -41,5 +47,5 @@ export function getPickerAdapterComponent(pickerType: string): ComponentType<Pic
   return PICKER_ADAPTER_MAP[pickerType] ?? FallbackAdapter
 }
 
-export { AirDatepickerAdapter, BootstrapUXAdapter, FlatpickrAdapter, ReactDatepickerAdapter, ReactDayPickerAdapter, PikadayAdapter, LitepickerAdapter, JQueryUIDatepickerAdapter, DateRangePickerAdapter, MuiDatepickerAdapter, AntdDatepickerAdapter, PrimeNGDatepickerAdapter, AngularMaterialAdapter, KendoDatepickerAdapter, SyncfusionDatepickerAdapter, FallbackAdapter }
+export { AirDatepickerAdapter, BootstrapUXAdapter, FlatpickrAdapter, ReactDatepickerAdapter, ReactDayPickerAdapter, PikadayAdapter, LitepickerAdapter, JQueryUIDatepickerAdapter, DateRangePickerAdapter, MuiDatepickerAdapter, AntdDatepickerAdapter, PrimeNGDatepickerAdapter, AngularMaterialAdapter, KendoDatepickerAdapter, SyncfusionDatepickerAdapter, ClarityDatepickerAdapter, DevExpressDatepickerAdapter, IonicDatetimeAdapter, FallbackAdapter }
 export type { PickerAdapterProps, PickerAdapterMode } from './types'

@@ -25,6 +25,8 @@ export function KendoDatepickerAdapter({
     if (mode === 'range') onChange(startDate, e.value ?? null)
   }
 
+  const pickerWidth = '240px'
+
   if (mode === 'range') {
     return (
       <div className="picker-adapter picker-adapter--kendo" data-testid="picker-adapter-kendo">
@@ -38,6 +40,7 @@ export function KendoDatepickerAdapter({
             disabled={disabled}
             min={minDate ?? undefined}
             max={maxDate ?? undefined}
+            width={pickerWidth}
             data-testid="kendo-datepicker-start"
           />
           <DatePicker
@@ -48,6 +51,7 @@ export function KendoDatepickerAdapter({
             disabled={disabled}
             min={startDate ?? minDate ?? undefined}
             max={maxDate ?? undefined}
+            width={pickerWidth}
             data-testid="kendo-datepicker-end"
           />
         </div>
@@ -66,6 +70,7 @@ export function KendoDatepickerAdapter({
         disabled={disabled}
         min={minDate ?? undefined}
         max={maxDate ?? undefined}
+        width={pickerWidth}
         data-testid="kendo-datepicker-single"
       />
     </div>

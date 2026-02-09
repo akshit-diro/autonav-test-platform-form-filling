@@ -63,11 +63,9 @@ These variants use **FallbackAdapter** because no embedded adapter is implemente
 | 12 | DS1-KENDO | Kendo UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 13 | DS1-SYNCFUSION | Syncfusion DatePicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 14 | DS1-DEVEXPRESS | DevExpress Date Editor | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 15 | DS1-CARBON | Carbon Design DatePicker (IBM) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 16 | DS1-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 15 | DS1-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 17 | DS1-SEMANTIC_UI | Semantic UI Calendar | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 18 | DS1-MOBISCROLL | Mobiscroll Date Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 19 | DS1-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 18 | DS1-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 20 | DS2-PIKADAY | Pikaday | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 21 | DS2-AIR_DATEPICKER | Air Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 22 | DS2-JQUERY_UI | jQuery UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
@@ -82,11 +80,9 @@ These variants use **FallbackAdapter** because no embedded adapter is implemente
 | 31 | DS2-KENDO | Kendo UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 32 | DS2-SYNCFUSION | Syncfusion DatePicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 33 | DS2-DEVEXPRESS | DevExpress Date Editor | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 34 | DS2-CARBON | Carbon Design DatePicker (IBM) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 35 | DS2-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 34 | DS2-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 36 | DS2-SEMANTIC_UI | Semantic UI Calendar | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 37 | DS2-MOBISCROLL | Mobiscroll Date Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 38 | DS2-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 37 | DS2-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 39 | DS3-PIKADAY | Pikaday | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 40 | DS3-AIR_DATEPICKER | Air Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 41 | DS3-JQUERY_UI | jQuery UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
@@ -101,11 +97,9 @@ These variants use **FallbackAdapter** because no embedded adapter is implemente
 | 50 | DS3-KENDO | Kendo UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 51 | DS3-SYNCFUSION | Syncfusion DatePicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 52 | DS3-DEVEXPRESS | DevExpress Date Editor | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 53 | DS3-CARBON | Carbon Design DatePicker (IBM) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 54 | DS3-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 53 | DS3-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 55 | DS3-SEMANTIC_UI | Semantic UI Calendar | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 56 | DS3-MOBISCROLL | Mobiscroll Date Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 57 | DS3-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 56 | DS3-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 58 | DS6-PIKADAY | Pikaday | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 59 | DS6-AIR_DATEPICKER | Air Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 60 | DS6-JQUERY_UI | jQuery UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
@@ -120,15 +114,13 @@ These variants use **FallbackAdapter** because no embedded adapter is implemente
 | 69 | DS6-KENDO | Kendo UI Datepicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 70 | DS6-SYNCFUSION | Syncfusion DatePicker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 71 | DS6-DEVEXPRESS | DevExpress Date Editor | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 72 | DS6-CARBON | Carbon Design DatePicker (IBM) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 73 | DS6-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 72 | DS6-CLARITY | Clarity Datepicker (VMware) | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 | 74 | DS6-SEMANTIC_UI | Semantic UI Calendar | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 75 | DS6-MOBISCROLL | Mobiscroll Date Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
-| 76 | DS6-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
+| 75 | DS6-IONIC | Ionic DateTime Picker | No embedded adapter; FallbackAdapter (native/text inputs) used. |
 
 **Reason (all rows):** Only **FLATPICKR** and **REACT_DATEPICKER** have embedded adapters in `picker-adapters/`. All other picker types are unmapped and resolve to **FallbackAdapter**, which renders one or two native/text date inputs instead of the third-party calendar widget.
 
-**Total: 76 fallback scenarios** (DS1, DS2, DS3, DS6 × 19 pickers each; 21 pickers in registry minus 2 Real = 19 fallback pickers).
+**Total: 72 fallback scenarios** (DS1, DS2, DS3, DS6 × 18 pickers each; 20 pickers in registry minus 2 Real = 18 fallback pickers).
 
 ---
 
@@ -170,7 +162,7 @@ Each variant is **DS&lt;n&gt;-&lt;PICKER&gt;** (e.g. `DS1-FLATPICKR`). Variants 
 
 ## 3. Per-variant status (80 rows)
 
-Picker registry order: FLATPICKR, PIKADAY, AIR_DATEPICKER, JQUERY_UI, BOOTSTRAP_UX, DATERANGEPICKER, LITEPICKER, REACT_DATEPICKER, MUI, ANTD, REACT_DAY_PICKER, ANGULAR_MATERIAL, PRIMENG, KENDO, SYNCFUSION, DEVEXPRESS, CARBON, CLARITY, SEMANTIC_UI, MOBISCROLL, IONIC.
+Picker registry order: FLATPICKR, PIKADAY, AIR_DATEPICKER, JQUERY_UI, BOOTSTRAP_UX, DATERANGEPICKER, LITEPICKER, REACT_DATEPICKER, MUI, ANTD, REACT_DAY_PICKER, ANGULAR_MATERIAL, PRIMENG, KENDO, SYNCFUSION, DEVEXPRESS, CLARITY, SEMANTIC_UI, IONIC.
 
 **Legend:**  
 - **Real** = Flatpickr or React Datepicker adapter (embedded widget).  
@@ -194,10 +186,8 @@ Picker registry order: FLATPICKR, PIKADAY, AIR_DATEPICKER, JQUERY_UI, BOOTSTRAP_
 | DS1-KENDO | Presets | Kendo UI Datepicker | Fallback |
 | DS1-SYNCFUSION | Presets | Syncfusion DatePicker | Fallback |
 | DS1-DEVEXPRESS | Presets | DevExpress Date Editor | Fallback |
-| DS1-CARBON | Presets | Carbon Design (IBM) | Fallback |
 | DS1-CLARITY | Presets | Clarity (VMware) | Fallback |
 | DS1-SEMANTIC_UI | Presets | Semantic UI Calendar | Fallback |
-| DS1-MOBISCROLL | Presets | Mobiscroll | Fallback |
 | DS1-IONIC | Presets | Ionic DateTime | Fallback |
 | DS2-FLATPICKR | From–To | Flatpickr | Real |
 | DS2-PIKADAY | From–To | Pikaday | Fallback |
@@ -215,10 +205,8 @@ Picker registry order: FLATPICKR, PIKADAY, AIR_DATEPICKER, JQUERY_UI, BOOTSTRAP_
 | DS2-KENDO | From–To | Kendo UI Datepicker | Fallback |
 | DS2-SYNCFUSION | From–To | Syncfusion DatePicker | Fallback |
 | DS2-DEVEXPRESS | From–To | DevExpress Date Editor | Fallback |
-| DS2-CARBON | From–To | Carbon Design (IBM) | Fallback |
 | DS2-CLARITY | From–To | Clarity (VMware) | Fallback |
 | DS2-SEMANTIC_UI | From–To | Semantic UI Calendar | Fallback |
-| DS2-MOBISCROLL | From–To | Mobiscroll | Fallback |
 | DS2-IONIC | From–To | Ionic DateTime | Fallback |
 | DS3-FLATPICKR | Dual calendar | Flatpickr | Real |
 | DS3-PIKADAY | Dual calendar | Pikaday | Fallback |
@@ -236,10 +224,8 @@ Picker registry order: FLATPICKR, PIKADAY, AIR_DATEPICKER, JQUERY_UI, BOOTSTRAP_
 | DS3-KENDO | Dual calendar | Kendo UI Datepicker | Fallback |
 | DS3-SYNCFUSION | Dual calendar | Syncfusion DatePicker | Fallback |
 | DS3-DEVEXPRESS | Dual calendar | DevExpress Date Editor | Fallback |
-| DS3-CARBON | Dual calendar | Carbon Design (IBM) | Fallback |
 | DS3-CLARITY | Dual calendar | Clarity (VMware) | Fallback |
 | DS3-SEMANTIC_UI | Dual calendar | Semantic UI Calendar | Fallback |
-| DS3-MOBISCROLL | Dual calendar | Mobiscroll | Fallback |
 | DS3-IONIC | Dual calendar | Ionic DateTime | Fallback |
 | DS6-FLATPICKR | Inline calendar | Flatpickr | Real |
 | DS6-REACT_DATEPICKER | Inline calendar | React Datepicker | Real |

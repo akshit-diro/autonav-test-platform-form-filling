@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import {
   getScenario,
+  getTestScenarioId,
   scenarioIds,
   PICKER_REGISTRY,
 } from '../../config/scenarioMatrix'
@@ -18,11 +19,6 @@ const BASE_ONLY_INDICES = [3, 4] as const
 /** Scenario ID for variant: base scenario index (0–5) + picker code (e.g. DS1-FLATPICKR). */
 function getVariantScenarioId(baseIndex: number, pickerCode: string): string {
   return `DS${baseIndex + 1}-${pickerCode}`
-}
-
-/** Display label for a cell: DS<base_case_id>.<variant_id> */
-function getCellDisplayLabel(baseCaseId: number, variantId: number): string {
-  return `DS${baseCaseId}.${variantId}`
 }
 
 type RowKind = { type: 'base' } | { type: 'picker'; pickerCode: string; pickerDisplayName: string }
@@ -52,9 +48,10 @@ export function StatementsPickerPage() {
 
   const tableColumnLabels = TABLE_COLUMN_INDICES.map((i) => `DS${i + 1}`)
 
+  const pickersForStatements = PICKER_REGISTRY.filter((p) => p.code !== 'SEMANTIC_UI')
   const rows: RowKind[] = [
     { type: 'base' },
-    ...PICKER_REGISTRY.map((p) => ({
+    ...pickersForStatements.map((p) => ({
       type: 'picker' as const,
       pickerCode: p.code,
       pickerDisplayName: p.displayName,
@@ -118,8 +115,7 @@ export function StatementsPickerPage() {
                     {tableColumnLabels.map((label, colIndex) => {
                       const scenarioId = getCellScenarioId(row, colIndex)
                       const allowed = scenarioId != null && allowedSet.has(scenarioId)
-                      const baseCaseId = TABLE_COLUMN_INDICES[colIndex]! + 1
-                      const cellLabel = scenarioId ? getCellDisplayLabel(baseCaseId, variantId) : '—'
+                      const cellLabel = scenarioId ? getTestScenarioId(scenarioId) : '—'
 
                       return (
                         <td
@@ -157,15 +153,15 @@ export function StatementsPickerPage() {
             {BASE_ONLY_INDICES.map((i) => {
               const scenarioId = scenarioIds[i]!
               const scenario = getScenario(scenarioId)
-              const label = `DS${i + 1}`
+              const testScenarioId = getTestScenarioId(scenarioId)
               if (!allowedSet.has(scenarioId)) return null
               return (
-                <li key={scenarioId} data-testid={`statements-picker-base-only-${label}`}>
+                <li key={scenarioId} data-testid={`statements-picker-base-only-${testScenarioId}`}>
                   <Link
                     to={getStatementsPathForScenario(scenarioId)}
                     data-testid={`statements-picker-link-${scenarioId}`}
                   >
-                    {label}
+                    {testScenarioId}
                   </Link>
                   {scenario?.displayName != null && (
                     <span className="statements-picker-base-only__name"> — {scenario.displayName}</span>

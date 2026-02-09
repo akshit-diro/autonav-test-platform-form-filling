@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { credentials } from '../../auth/credentials'
 import type { CredentialEntry } from '../../auth/credentials'
-import { scenarioMatrix } from '../../config/scenarioMatrix'
-import { enabledBaseScenarioIds } from '../../config/scenarioFlags'
+import { getScenario, getTestScenarioId } from '../../config/scenarioMatrix'
+import { enabledAllScenarioIds } from '../../config/scenarioFlags'
 import { UX_DELAYS } from '../../config/uxDelays'
 import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
@@ -30,16 +30,16 @@ const adminUserList = ADMIN_USERNAMES.filter((u) => credentials[u]).map((usernam
   }
 })
 
-const scenarioList = enabledBaseScenarioIds.map((scenarioId, index) => {
-  const entry = scenarioMatrix[scenarioId]
-  const cred = credentials[scenarioId]
+const scenarioList = enabledAllScenarioIds.map((scenarioId) => {
+  const entry = getScenario(scenarioId)
+  const testScenarioId = getTestScenarioId(scenarioId)
+  const cred = credentials[testScenarioId]
   return {
-    testScenarioId: `DS${index + 1}`,
+    testScenarioId,
     scenarioId,
-    displayName: entry.displayName,
-    username: cred?.password != null ? scenarioId : '—',
+    username: cred != null ? testScenarioId : '—',
     password: cred?.password ?? '—',
-    route: entry.route,
+    route: entry?.route ?? `—`,
   }
 })
 
@@ -195,17 +195,15 @@ export function LoginPage() {
                 <thead>
                   <tr>
                     <th>Test scenario ID</th>
-                    <th>Display name</th>
                     <th>Username</th>
                     <th>Password</th>
                     <th>Route</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {scenarioList.map(({ testScenarioId, displayName, username: u, password: p, route }) => (
+                  {scenarioList.map(({ testScenarioId, username: u, password: p, route }) => (
                     <tr key={testScenarioId} data-testid={`credentials-scenario-row-${testScenarioId}`}>
                       <td data-testid="cred-test-scenario-id">{testScenarioId}</td>
-                      <td data-testid="cred-scenario-display-name">{displayName}</td>
                       <td data-testid="cred-scenario-username">{u}</td>
                       <td data-testid="cred-scenario-password">{p}</td>
                       <td data-testid="cred-scenario-route">{route}</td>

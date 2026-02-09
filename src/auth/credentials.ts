@@ -2,10 +2,13 @@
  * Hard-coded credentials for frontend-only auth (automation testing).
  * No hashing, no persistence beyond memory.
  * Post-login landing is always Accounts (/). Statements navigation is role- and scenario-aware.
+ *
+ * Each active base and variant scenario has a dedicated credential: username = password = test scenario ID (DS<base>.<variant_id>).
  */
 
 import type { DatePickerScenarioId } from './routing'
 import { enabledAllScenarioIds } from '../config/scenarioFlags'
+import { getTestScenarioId, scenarioMatrix, scenarioIds } from '../config/scenarioMatrix'
 
 export interface CredentialEntry {
   password: string
@@ -22,6 +25,37 @@ export interface CredentialEntry {
 
 export type CredentialsMap = Record<string, CredentialEntry>
 
+/** DS id (DS1–DS6) to base scenario slug for defaultScenario. */
+const DS_TO_BASE_SLUG: Record<string, DatePickerScenarioId> = Object.fromEntries(
+  scenarioIds.map((slug, i) => [`DS${i + 1}`, slug as DatePickerScenarioId])
+)
+
+function defaultScenarioForScenarioId(scenarioId: string): DatePickerScenarioId {
+  const baseEntry = scenarioMatrix[scenarioId]
+  if (baseEntry) return scenarioId as DatePickerScenarioId
+  const match = scenarioId.match(/^DS(\d+)-/)
+  if (match) {
+    const baseSlug = DS_TO_BASE_SLUG[`DS${match[1]}`]
+    if (baseSlug) return baseSlug
+  }
+  return 'presets'
+}
+
+/** One credential per enabled scenario: key and password = test scenario ID (DS<base>.<variant_id>). */
+const scenarioCredentials: CredentialsMap = Object.fromEntries(
+  enabledAllScenarioIds.map((scenarioId) => {
+    const testScenarioId = getTestScenarioId(scenarioId)
+    return [
+      testScenarioId,
+      {
+        password: testScenarioId,
+        allowedScenarios: [scenarioId],
+        defaultScenario: defaultScenarioForScenarioId(scenarioId),
+      },
+    ]
+  })
+)
+
 export const credentials: CredentialsMap = {
   admin: {
     password: 'admin123',
@@ -29,29 +63,5 @@ export const credentials: CredentialsMap = {
     defaultScenario: 'presets',
     scenarioAgnostic: true,
   },
-  presets: {
-    password: 'presets123',
-    allowedScenarios: ['presets'],
-    defaultScenario: 'presets',
-  },
-  'from-to': {
-    password: 'fromto123',
-    allowedScenarios: ['from-to'],
-    defaultScenario: 'from-to',
-  },
-  'dual-calendar': {
-    password: 'dual123',
-    allowedScenarios: ['dual-calendar'],
-    defaultScenario: 'dual-calendar',
-  },
-  'month-year': {
-    password: 'monthyear123',
-    allowedScenarios: ['month-year'],
-    defaultScenario: 'month-year',
-  },
-  'year-only': {
-    password: 'yearonly123',
-    allowedScenarios: ['year-only'],
-    defaultScenario: 'year-only',
-  },
+  ...scenarioCredentials,
 }

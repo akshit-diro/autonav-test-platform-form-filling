@@ -1,4 +1,8 @@
 export { DashboardNav } from './DashboardNav'
+export { DashboardLayout } from './DashboardLayout'
+export { DomNoise, DomNoiseDecorativeIcon } from './DomNoise'
+export { PickerContainer } from './PickerContainer'
+export type { PickerContainerProps } from './PickerContainer'
 export { SimpleCalendar } from './SimpleCalendar'
 export type { SimpleCalendarProps } from './SimpleCalendar'
 export { CalendarPopover } from './CalendarPopover'

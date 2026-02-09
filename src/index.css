@@ -468,6 +468,51 @@ body {
   flex-shrink: 0;
 }
 
+/* Reauth modal (sensitive action) */
+.reauth-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.reauth-modal {
+  background: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border);
+  border-radius: var(--bank-radius);
+  box-shadow: var(--bank-shadow);
+  padding: 1.5rem;
+  min-width: 20rem;
+  max-width: 90vw;
+}
+
+.reauth-modal h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.reauth-modal p {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  color: var(--bank-text-muted);
+}
+
+.reauth-modal label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.reauth-modal input[type="password"] {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--bank-border);
+  border-radius: 4px;
+}
+
 /* Statement pages */
 .page--statement > p:last-of-type {
   margin-top: 1.5rem;
@@ -567,4 +612,72 @@ body {
 .bank-app [data-testid^="wheel-column"] {
   border-color: var(--bank-border) !important;
   border-radius: var(--bank-radius);
+}
+
+/* DOM noise (VITE_DOM_NOISE_LEVEL): deterministic, never blocks happy path */
+.dom-noise-container {
+  margin-bottom: 0.5rem;
+}
+
+.dom-noise--hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.dom-noise-icon {
+  margin-right: 0.25em;
+  pointer-events: none;
+}
+
+.dom-noise--disabled-input input,
+.dom-noise--dropdown select {
+  opacity: 0.7;
+}
+
+/* --- Bank theme B: sidebar layout (VITE_BANK_THEME=bank_b) --- */
+.bank-app--theme-b.bank-app {
+  padding: 0;
+}
+
+.bank-app--theme-b .bank-app__shell {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+}
+
+.bank-app--theme-b .bank-app__sidebar {
+  width: 12rem;
+  flex-shrink: 0;
+  padding: 1.25rem 1rem;
+  border-right: 1px solid var(--bank-border);
+  background: var(--bank-bg-elevated);
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav__list {
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav__link {
+  margin-right: 0;
+  padding: 0.5rem 0.75rem;
+}
+
+.bank-app--theme-b .bank-app__content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 100%;
 }

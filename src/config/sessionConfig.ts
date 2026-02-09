@@ -1,15 +1,20 @@
 /**
- * Session and security timeouts. Deterministic values for testability.
+ * Session and security timeouts. Backed by centralized appConfig (env with safe defaults).
+ * Uses VITE_SESSION_IDLE_TIMEOUT_MS and VITE_SESSION_WARNING_MS when set.
  * Frontend-only; no backend.
  */
+import { appConfig } from './appConfig'
+
 export const SESSION_CONFIG = {
-  /** Logout after this many ms of no activity (e.g. 2 minutes). */
-  INACTIVITY_TIMEOUT_MS: 2 * 60 * 1000,
-  /** Show warning this many ms before logout (e.g. 15 seconds). */
-  WARNING_BEFORE_LOGOUT_MS: 15 * 1000,
+  get INACTIVITY_TIMEOUT_MS() {
+    return appConfig.sessionIdleTimeoutMs
+  },
+  get WARNING_BEFORE_LOGOUT_MS() {
+    return appConfig.sessionWarningMs
+  },
 } as const
 
 /** Time after which we show the warning: inactivity timeout minus warning duration. */
 export function getWarningTriggerMs(): number {
-  return SESSION_CONFIG.INACTIVITY_TIMEOUT_MS - SESSION_CONFIG.WARNING_BEFORE_LOGOUT_MS
+  return appConfig.sessionIdleTimeoutMs - appConfig.sessionWarningMs
 }

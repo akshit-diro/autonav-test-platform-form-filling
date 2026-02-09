@@ -1,13 +1,25 @@
-import { useMemo, useState, useEffect } from 'react'
-import { format } from 'date-fns'
+import { useMemo, useState, useEffect, useRef } from 'react'
+import { formatDate } from '../../config/dateLocale'
 import { SimpleCalendar } from '../../components/SimpleCalendar'
+import { PickerContainer } from '../../components/PickerContainer'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
+import { appConfig } from '../../config/appConfig'
 import { stressConfig } from '../../config/stressConfig'
 import { UX_DELAYS } from '../../config/uxDelays'
+import { getBankThemeConfig } from '../../config/bankThemes'
+import { DomNoiseDecorativeIcon } from '../../components/DomNoise'
 import { validateRange, presetFns, type PresetId } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
-import { delay } from '../../utils/delay'
+import { chaosDelay, chaosShuffled } from '../../utils/chaos'
+import { useAuth } from '../../auth/useAuth'
 import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
+import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
+import {
+  getLastDateRange,
+  setLastDateRange,
+  getLastCalendarMonth,
+  setLastCalendarMonth,
+} from '../../utils/stateLeakage'
 import { isDateDisabledAfterSelection } from '../../utils/stressDisabledDates'
 
 const PRESETS: { id: PresetId; label: string }[] = [
@@ -18,15 +30,39 @@ const PRESETS: { id: PresetId; label: string }[] = [
   { id: 'ytd', label: 'YTD' },
 ]
 
+function getInitialRange(): { from: string; to: string } {
+  const r = getLastDateRange()
+  return { from: r?.from ?? '', to: r?.to ?? '' }
+}
+
+function getInitialCalendarMonth(): Date {
+  const m = getLastCalendarMonth()
+  return m ? new Date(m + '-01') : new Date()
+}
+
 export function PresetsScenario() {
-  const [startInput, setStartInput] = useState('')
-  const [endInput, setEndInput] = useState('')
+  const [startInput, setStartInput] = useState(() => getInitialRange().from)
+  const [endInput, setEndInput] = useState(() => getInitialRange().to)
   const [customOpen, setCustomOpen] = useState(false)
-  const [calendarMonth, setCalendarMonth] = useState(() => new Date())
+  const [calendarMonth, setCalendarMonth] = useState(() => getInitialCalendarMonth())
   const [pendingEnd, setPendingEnd] = useState<Date | null>(null)
   const [downloadReady, setDownloadReady] = useState(false)
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const isCooldown = useDownloadCooldown([startInput, endInput])
+  const downloadButtonRef = useRef<HTMLButtonElement>(null)
+  const firstPresetRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (!appConfig.enableStateLeakage || !startInput.trim() || !endInput.trim()) return
+    setLastDateRange({ from: startInput.trim(), to: endInput.trim() })
+  }, [startInput, endInput])
+
+  useEffect(() => {
+    if (!appConfig.enableStateLeakage) return
+    const y = calendarMonth.getFullYear()
+    const mm = String(calendarMonth.getMonth() + 1).padStart(2, '0')
+    setLastCalendarMonth(`${y}-${mm}`)
+  }, [calendarMonth])
 
   const validationResult = useMemo(
     () => validateRange(startInput, endInput),
@@ -35,6 +71,7 @@ export function PresetsScenario() {
   const resolvedStart = validationResult.range?.start
   const resolvedEnd = validationResult.range?.end
   const valid = validationResult.valid
+  useFocusResetOnError(valid, firstPresetRef)
 
   useEffect(() => {
     if (!valid) {
@@ -51,8 +88,8 @@ export function PresetsScenario() {
   }, [valid])
 
   function applyRange(start: Date, end: Date) {
-    setStartInput(format(start, 'yyyy-MM-dd'))
-    setEndInput(format(end, 'yyyy-MM-dd'))
+    setStartInput(formatDate(start))
+    setEndInput(formatDate(end))
   }
 
   async function handlePreset(id: PresetId) {
@@ -60,14 +97,17 @@ export function PresetsScenario() {
     if (!fn) return
     const { start, end } = fn()
     applyRange(start, end)
-    await delay(stressConfig.uiDelayMs)
+    await chaosDelay(stressConfig.uiDelayMs)
+    if (appConfig.enableKeyboardTraps) {
+      setTimeout(() => downloadButtonRef.current?.focus(), 0)
+    }
   }
 
   async function handleCalendarDay(date: Date) {
     if (!pendingEnd) {
       setPendingEnd(date)
       applyRange(date, date)
-      await delay(stressConfig.uiDelayMs)
+      await chaosDelay(stressConfig.uiDelayMs)
       return
     }
     const start = new Date(pendingEnd)
@@ -78,7 +118,7 @@ export function PresetsScenario() {
       applyRange(start, end)
     }
     setPendingEnd(null)
-    await delay(stressConfig.uiDelayMs)
+    await chaosDelay(stressConfig.uiDelayMs)
   }
 
   const showDisabledDatesStress =
@@ -90,12 +130,20 @@ export function PresetsScenario() {
     !generatingPdf &&
     (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
+  const { requireReauthBeforeSensitiveAction } = useAuth()
+
+  const displayPresets = useMemo(
+    () => (appConfig.chaosLevel >= 1 ? chaosShuffled(PRESETS) : PRESETS),
+    []
+  )
+
   return (
     <div>
       <div data-testid="preset-buttons" style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-        {PRESETS.map(({ id, label }) => (
+        {displayPresets.map(({ id, label }, index) => (
           <button
             key={id}
+            ref={index === 0 ? firstPresetRef : undefined}
             type="button"
             data-testid={`preset-${id}`}
             onClick={() => void handlePreset(id)}
@@ -115,28 +163,38 @@ export function PresetsScenario() {
 
       {customOpen && (
         <div data-testid="calendar-placeholder" style={{ marginTop: '1rem' }}>
-          <SimpleCalendar
-            month={calendarMonth}
-            onMonthChange={setCalendarMonth}
-            start={resolvedStart ?? null}
-            end={resolvedEnd ?? null}
-            onSelectDay={(d) => void handleCalendarDay(d)}
-            isDayDisabled={isDayDisabled}
-          />
+          <PickerContainer>
+            <SimpleCalendar
+              month={calendarMonth}
+              onMonthChange={setCalendarMonth}
+              start={resolvedStart ?? null}
+              end={resolvedEnd ?? null}
+              onSelectDay={(d) => void handleCalendarDay(d)}
+              isDayDisabled={isDayDisabled}
+            />
+          </PickerContainer>
         </div>
       )}
 
       <span style={{ display: 'inline-flex', alignItems: 'center' }}>
         <button
+          ref={downloadButtonRef}
           type="button"
           disabled={!downloadEnabled}
+          title={
+            !appConfig.enableAntiPatterns && !downloadEnabled
+              ? 'Select a valid date range to enable download'
+              : undefined
+          }
           data-testid="download-pdf"
           data-validation-valid={validationResult.valid}
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
+            const ok = await requireReauthBeforeSensitiveAction()
+            if (!ok) return
             setGeneratingPdf(true)
-            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            await chaosDelay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
             try {
               const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
               downloadPdf(bytes)
@@ -145,7 +203,8 @@ export function PresetsScenario() {
             }
           }}
         >
-          Download PDF
+          <DomNoiseDecorativeIcon type="download" />
+          {getBankThemeConfig().downloadButtonLabel}
         </button>
         <LoadingSpinner
           visible={

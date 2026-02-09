@@ -1,15 +1,14 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { scenarioMatrix } from '../../config/scenarioMatrix'
-import { DashboardNav } from '../../components/DashboardNav'
+import { DashboardLayout } from '../../components/DashboardLayout'
 
 export function StatementsPage() {
   const { allowedScenarios } = useAuth()
   const entries = Object.entries(scenarioMatrix).filter(([id]) => allowedScenarios.includes(id))
 
   return (
-    <div className="page page--dashboard page--statements">
-      <DashboardNav />
+    <DashboardLayout contentClassName="page--dashboard page--statements">
       <h1>Statement download</h1>
       <p className="page__description">
         Choose a statement type and date range. You will be able to download a PDF.
@@ -30,6 +29,6 @@ export function StatementsPage() {
           ))}
         </ul>
       </section>
-    </div>
+    </DashboardLayout>
   )
 }

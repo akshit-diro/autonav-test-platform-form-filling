@@ -10,8 +10,16 @@ import {
   addMonths,
   subMonths,
 } from 'date-fns'
+import { getDateLocale, getWeekStartsOn, formatDate } from '../config/dateLocale'
 
-const WEEKDAY_HEADERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+function getWeekdayHeaders(): string[] {
+  const locale = getDateLocale()
+  const weekStartsOn = getWeekStartsOn()
+  const base = new Date(2025, 0, 5 + weekStartsOn)
+  return [0, 1, 2, 3, 4, 5, 6].map((i) =>
+    format(addDays(base, i), 'EEE', { locale })
+  )
+}
 
 export interface SimpleCalendarProps {
   /** Currently displayed month. */
@@ -43,10 +51,13 @@ export function SimpleCalendar({
   isDayDisabled,
   calendarTestId = 'calendar',
 }: SimpleCalendarProps) {
+  const locale = getDateLocale()
+  const weekStartsOn = getWeekStartsOn()
   const monthStart = startOfMonth(month)
   const monthEnd = endOfMonth(month)
-  const calStart = startOfWeek(monthStart)
-  const calEnd = endOfWeek(monthEnd)
+  const calStart = startOfWeek(monthStart, { weekStartsOn })
+  const calEnd = endOfWeek(monthEnd, { weekStartsOn })
+  const weekdayHeaders = getWeekdayHeaders()
 
   const rows: Date[] = []
   let d = calStart
@@ -79,7 +90,7 @@ export function SimpleCalendar({
           ‹
         </button>
         <span data-testid="calendar-month-label" style={{ minWidth: '8rem' }}>
-          {format(month, 'MMMM yyyy')}
+          {format(month, 'MMMM yyyy', { locale })}
         </span>
         <button
           type="button"
@@ -93,7 +104,7 @@ export function SimpleCalendar({
       <table role="grid" aria-label="Calendar">
         <thead>
           <tr>
-            {WEEKDAY_HEADERS.map((day) => (
+            {weekdayHeaders.map((day) => (
               <th key={day} scope="col" style={{ padding: '2px 4px', fontSize: '0.75rem' }}>
                 {day}
               </th>
@@ -114,7 +125,7 @@ export function SimpleCalendar({
                     key={date.toISOString()}
                     role="gridcell"
                     data-testid="calendar-cell"
-                    data-date={format(date, 'yyyy-MM-dd')}
+                    data-date={formatDate(date)}
                     data-disabled={disabled || undefined}
                     data-calendar-row={rowIdx}
                     data-calendar-col={week.indexOf(date)}
@@ -138,10 +149,10 @@ export function SimpleCalendar({
                         borderRadius: 2,
                         opacity: disabled ? 0.5 : 1,
                       }}
-                      aria-label={`Choose ${format(date, 'yyyy-MM-dd')}`}
+                      aria-label={`Choose ${formatDate(date)}`}
                       aria-disabled={disabled}
                     >
-                      {format(date, 'd')}
+                      {format(date, 'd', { locale })}
                     </button>
                   </td>
                 )

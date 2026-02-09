@@ -1,12 +1,17 @@
 /**
- * Central config for bank-style UX delays. All deterministic (fixed ms).
- * Simulates real-world latency without flakiness.
+ * Bank-style UX delays. Backed by centralized appConfig (env with safe defaults).
+ * All deterministic (fixed ms).
  */
+import { appConfig } from './appConfig'
+
 export const UX_DELAYS = {
-  /** Disable download button for this long (ms) after date selection changes. */
-  DISABLE_DOWNLOAD_AFTER_SELECTION_MS: 400,
-  /** Show loading spinner for this long (ms) before starting PDF generation on Download click. */
-  SPINNER_BEFORE_PDF_MS: 600,
-  /** Delay (ms) before navigating after successful login. */
-  DELAY_BEFORE_NAVIGATE_AFTER_LOGIN_MS: 300,
+  get DISABLE_DOWNLOAD_AFTER_SELECTION_MS() {
+    return appConfig.disableDownloadAfterSelectionMs
+  },
+  get SPINNER_BEFORE_PDF_MS() {
+    return appConfig.spinnerBeforePdfMs
+  },
+  get DELAY_BEFORE_NAVIGATE_AFTER_LOGIN_MS() {
+    return appConfig.delayBeforeNavigateAfterLoginMs
+  },
 } as const

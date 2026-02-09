@@ -1,12 +1,20 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { startOfMonth, endOfMonth } from 'date-fns'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
+import { appConfig } from '../../config/appConfig'
 import { stressConfig } from '../../config/stressConfig'
 import { UX_DELAYS } from '../../config/uxDelays'
+import { getBankThemeConfig } from '../../config/bankThemes'
+import { DomNoiseDecorativeIcon } from '../../components/DomNoise'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
-import { delay } from '../../utils/delay'
+import { chaosDelay, chaosPick } from '../../utils/chaos'
+import { formatDate, parseDate } from '../../config/dateLocale'
+import { useAuth } from '../../auth/useAuth'
 import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
+import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
+import { useValidationErrorDisplay } from '../../utils/useValidationErrorDisplay'
+import { getLastDateRange, setLastDateRange } from '../../utils/stateLeakage'
 
 const MONTH_LABELS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -19,16 +27,29 @@ function getYearOptions(): number[] {
   return Array.from({ length: 6 }, (_, i) => from + i)
 }
 
+function initialMonthYearFromLeakage(): { year: number | ''; month: number | '' } {
+  const r = getLastDateRange()
+  if (!r?.from) return { year: '', month: '' }
+  const d = parseDate(r.from)
+  if (!d || Number.isNaN(d.getTime())) return { year: '', month: '' }
+  const opts = getYearOptions()
+  const y = d.getFullYear()
+  const m = d.getMonth() + 1
+  if (!opts.includes(y)) return { year: '', month: '' }
+  return { year: y, month: m }
+}
+
 /**
  * Month & year picker. No day-level UI; selecting month resolves to full month range.
  * Validation applies (e.g. months with 31 days exceed max range).
  */
 export function MonthYearScenario() {
-  const [selectedYear, setSelectedYear] = useState<number | ''>('')
-  const [selectedMonth, setSelectedMonth] = useState<number | ''>('')
+  const [selectedYear, setSelectedYear] = useState<number | ''>(() => initialMonthYearFromLeakage().year)
+  const [selectedMonth, setSelectedMonth] = useState<number | ''>(() => initialMonthYearFromLeakage().month)
   const [downloadReady, setDownloadReady] = useState(false)
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const isCooldown = useDownloadCooldown([selectedYear, selectedMonth])
+  const yearSelectRef = useRef<HTMLSelectElement>(null)
 
   const range = useMemo(() => {
     if (selectedYear === '' || selectedMonth === '') return null
@@ -39,8 +60,8 @@ export function MonthYearScenario() {
     }
   }, [selectedYear, selectedMonth])
 
-  const startInput = range ? range.start.toISOString().slice(0, 10) : ''
-  const endInput = range ? range.end.toISOString().slice(0, 10) : ''
+  const startInput = range ? formatDate(range.start) : ''
+  const endInput = range ? formatDate(range.end) : ''
 
   const validationResult = useMemo(
     () => validateRange(startInput, endInput),
@@ -49,6 +70,7 @@ export function MonthYearScenario() {
   const resolvedStart = validationResult.range?.start ?? range?.start
   const resolvedEnd = validationResult.range?.end ?? range?.end
   const valid = validationResult.valid
+  useFocusResetOnError(valid, yearSelectRef)
 
   useEffect(() => {
     if (!valid) {
@@ -70,44 +92,74 @@ export function MonthYearScenario() {
     !generatingPdf &&
     (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
+  const hasValidationErrors = !valid && validationResult.errors.length > 0
+  const showValidationErrors = useValidationErrorDisplay(hasValidationErrors)
+  const { requireReauthBeforeSensitiveAction } = useAuth()
+
+  useEffect(() => {
+    if (!appConfig.enableStateLeakage || selectedYear === '' || selectedMonth === '') return
+    const d = new Date(selectedYear, selectedMonth - 1, 1)
+    setLastDateRange({
+      from: formatDate(startOfMonth(d)),
+      to: formatDate(endOfMonth(d)),
+    })
+  }, [selectedYear, selectedMonth])
+
+  const swapYearMonthOrder = useMemo(
+    () => appConfig.chaosLevel >= 1 && chaosPick([false, true]),
+    []
+  )
+
+  const yearField = (
+    <div key="year">
+      <label htmlFor="month-year-year">
+        Year{!appConfig.enableAntiPatterns ? ' (required)' : ''}
+      </label>
+      <select
+        ref={yearSelectRef}
+        id="month-year-year"
+        value={selectedYear}
+        onChange={(e) => setSelectedYear(e.target.value === '' ? '' : Number(e.target.value))}
+        data-testid="month-year-year"
+      >
+        <option value="">Select year</option>
+        {getYearOptions().map((y) => (
+          <option key={y} value={y}>
+            {y}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+  const monthField = (
+    <div key="month">
+      <label htmlFor="month-year-month">
+        Month{!appConfig.enableAntiPatterns ? ' (required)' : ''}
+      </label>
+      <select
+        id="month-year-month"
+        value={selectedMonth}
+        onChange={(e) => setSelectedMonth(e.target.value === '' ? '' : Number(e.target.value))}
+        data-testid="month-year-month"
+      >
+        <option value="">Select month</option>
+        {MONTH_LABELS.map((label, i) => (
+          <option key={i} value={i + 1}>
+            {label}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+  const pickerFields = swapYearMonthOrder ? [monthField, yearField] : [yearField, monthField]
+
   return (
     <div>
       <div data-testid="month-year-picker" style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
-        <div>
-          <label htmlFor="month-year-year">Year</label>
-          <select
-            id="month-year-year"
-            value={selectedYear}
-            onChange={(e) => setSelectedYear(e.target.value === '' ? '' : Number(e.target.value))}
-            data-testid="month-year-year"
-          >
-            <option value="">Select year</option>
-            {getYearOptions().map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label htmlFor="month-year-month">Month</label>
-          <select
-            id="month-year-month"
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value === '' ? '' : Number(e.target.value))}
-            data-testid="month-year-month"
-          >
-            <option value="">Select month</option>
-            {MONTH_LABELS.map((label, i) => (
-              <option key={i} value={i + 1}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
+        {pickerFields}
       </div>
 
-      {!valid && validationResult.errors.length > 0 && (
+      {showValidationErrors && (
         <div
           role="alert"
           data-testid="validation-errors"
@@ -126,13 +178,20 @@ export function MonthYearScenario() {
         <button
           type="button"
           disabled={!downloadEnabled}
+          title={
+            !appConfig.enableAntiPatterns && !downloadEnabled
+              ? 'Select a valid date range to enable download'
+              : undefined
+          }
           data-testid="download-pdf"
           data-validation-valid={validationResult.valid}
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
+            const ok = await requireReauthBeforeSensitiveAction()
+            if (!ok) return
             setGeneratingPdf(true)
-            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            await chaosDelay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
             try {
               const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
               downloadPdf(bytes)
@@ -141,7 +200,8 @@ export function MonthYearScenario() {
             }
           }}
         >
-          Download PDF
+          <DomNoiseDecorativeIcon type="download" />
+          {getBankThemeConfig().downloadButtonLabel}
         </button>
         <LoadingSpinner
           visible={

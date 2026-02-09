@@ -1,12 +1,20 @@
-import { useMemo, useState, useEffect, useCallback } from 'react'
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { WheelColumn } from '../../components/WheelColumn'
+import { appConfig } from '../../config/appConfig'
 import { stressConfig } from '../../config/stressConfig'
 import { UX_DELAYS } from '../../config/uxDelays'
+import { getBankThemeConfig } from '../../config/bankThemes'
+import { DomNoiseDecorativeIcon } from '../../components/DomNoise'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
-import { delay } from '../../utils/delay'
+import { chaosDelay } from '../../utils/chaos'
+import { formatDate, parseDate } from '../../config/dateLocale'
+import { useAuth } from '../../auth/useAuth'
 import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
+import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
+import { useValidationErrorDisplay } from '../../utils/useValidationErrorDisplay'
+import { getLastDateRange, setLastDateRange } from '../../utils/stateLeakage'
 
 const MONTH_LABELS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -27,24 +35,48 @@ function clampDay(day: number, month: number, year: number): number {
   return Math.min(max, Math.max(1, day))
 }
 
+function initialWheelFromLeakage(): { day: number; month: number; year: number } {
+  const r = getLastDateRange()
+  if (!r?.from) return { day: 15, month: 6, year: new Date().getFullYear() }
+  const d = parseDate(r.from)
+  if (!d || Number.isNaN(d.getTime())) return { day: 15, month: 6, year: new Date().getFullYear() }
+  const y = d.getFullYear()
+  const yearOpts = getYearOptions()
+  if (!yearOpts.includes(y)) return { day: 15, month: 6, year: new Date().getFullYear() }
+  return {
+    day: clampDay(d.getDate(), d.getMonth() + 1, y),
+    month: d.getMonth() + 1,
+    year: y,
+  }
+}
+
 /**
  * Mobile wheel / spinner picker. Day, month, year via scroll-only columns.
  * Selection updates only after scroll end (snap). Clicking does not select.
  */
 export function MobileWheelScenario() {
-  const [day, setDay] = useState(15)
-  const [month, setMonth] = useState(6)
-  const [year, setYear] = useState(new Date().getFullYear())
+  const initial = initialWheelFromLeakage()
+  const [day, setDay] = useState(initial.day)
+  const [month, setMonth] = useState(initial.month)
+  const [year, setYear] = useState(initial.year)
   const [downloadReady, setDownloadReady] = useState(false)
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const isCooldown = useDownloadCooldown([day, month, year])
+  const focusResetRef = useRef<HTMLDivElement>(null)
 
   const resolvedDate = useMemo(() => {
     const d = clampDay(day, month, year)
     return new Date(year, month - 1, d)
   }, [day, month, year])
 
-  const startInput = resolvedDate.toISOString().slice(0, 10)
+  useEffect(() => {
+    if (!appConfig.enableStateLeakage) return
+    const d = resolvedDate
+    const s = formatDate(d)
+    setLastDateRange({ from: s, to: s })
+  }, [resolvedDate])
+
+  const startInput = formatDate(resolvedDate)
   const endInput = startInput
 
   const validationResult = useMemo(
@@ -52,6 +84,7 @@ export function MobileWheelScenario() {
     [startInput, endInput]
   )
   const valid = validationResult.valid
+  useFocusResetOnError(valid, focusResetRef)
 
   useEffect(() => {
     if (!valid) {
@@ -96,8 +129,13 @@ export function MobileWheelScenario() {
     setDay((d) => clampDay(d, month, v))
   }, [month])
 
+  const hasValidationErrors = !valid && validationResult.errors.length > 0
+  const showValidationErrors = useValidationErrorDisplay(hasValidationErrors)
+  const { requireReauthBeforeSensitiveAction } = useAuth()
+
   return (
     <div>
+      <div ref={focusResetRef} tabIndex={-1} style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }} aria-hidden />
       <p style={{ fontSize: '0.875rem', marginBottom: '0.5rem' }}>
         Scroll each column to select. Clicking does not change the value.
       </p>
@@ -139,7 +177,7 @@ export function MobileWheelScenario() {
         </div>
       </div>
 
-      {!valid && validationResult.errors.length > 0 && (
+      {showValidationErrors && (
         <div
           role="alert"
           data-testid="validation-errors"
@@ -158,13 +196,20 @@ export function MobileWheelScenario() {
         <button
           type="button"
           disabled={!downloadEnabled}
+          title={
+            !appConfig.enableAntiPatterns && !downloadEnabled
+              ? 'Select a valid date range to enable download'
+              : undefined
+          }
           data-testid="download-pdf"
           data-validation-valid={validationResult.valid}
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !validationResult.range) return
+            const ok = await requireReauthBeforeSensitiveAction()
+            if (!ok) return
             setGeneratingPdf(true)
-            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            await chaosDelay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
             try {
               const { start, end } = validationResult.range
               const bytes = await generateDateRangeReport(start, end)
@@ -174,7 +219,8 @@ export function MobileWheelScenario() {
             }
           }}
         >
-          Download PDF
+          <DomNoiseDecorativeIcon type="download" />
+          {getBankThemeConfig().downloadButtonLabel}
         </button>
         <LoadingSpinner
           visible={

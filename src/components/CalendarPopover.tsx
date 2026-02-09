@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { SimpleCalendar } from './SimpleCalendar'
+import { PickerContainer } from './PickerContainer'
+import { useFocusTrap } from '../utils/useFocusTrap'
 
 export interface CalendarPopoverProps {
   open: boolean
@@ -47,6 +49,8 @@ export function CalendarPopover({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [open, onClose])
 
+  useFocusTrap(containerRef, open, onClose)
+
   function handleSelectDay(date: Date) {
     onSelectDate(date)
     onClose()
@@ -72,14 +76,16 @@ export function CalendarPopover({
         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
       }}
     >
-      <SimpleCalendar
-        month={month}
-        onMonthChange={setMonth}
-        start={value}
-        end={value}
-        onSelectDay={handleSelectDay}
-        isDayDisabled={isDayDisabled}
-      />
+      <PickerContainer>
+        <SimpleCalendar
+          month={month}
+          onMonthChange={setMonth}
+          start={value}
+          end={value}
+          onSelectDay={handleSelectDay}
+          isDayDisabled={isDayDisabled}
+        />
+      </PickerContainer>
     </div>
   )
 }

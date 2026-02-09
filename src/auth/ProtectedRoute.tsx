@@ -17,9 +17,9 @@ interface ProtectedRouteProps {
  */
 export function ProtectedRoute({ requiredScenario, children }: ProtectedRouteProps) {
   const location = useLocation()
-  const { isAuthenticated, allowedScenarios } = useAuth()
+  const { isFullyAuthenticated, allowedScenarios } = useAuth()
 
-  if (!isAuthenticated) {
+  if (!isFullyAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 

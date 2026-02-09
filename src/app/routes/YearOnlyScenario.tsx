@@ -1,12 +1,20 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { endOfMonth } from 'date-fns'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
+import { appConfig } from '../../config/appConfig'
 import { stressConfig } from '../../config/stressConfig'
 import { UX_DELAYS } from '../../config/uxDelays'
+import { getBankThemeConfig } from '../../config/bankThemes'
+import { DomNoiseDecorativeIcon } from '../../components/DomNoise'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
-import { delay } from '../../utils/delay'
+import { chaosDelay } from '../../utils/chaos'
+import { formatDate, parseDate } from '../../config/dateLocale'
+import { useAuth } from '../../auth/useAuth'
 import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
+import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
+import { useValidationErrorDisplay } from '../../utils/useValidationErrorDisplay'
+import { getLastDateRange, setLastDateRange } from '../../utils/stateLeakage'
 
 /** Fiscal year: April (year) to March (year+1). Returns start and end dates. */
 function fiscalYearRange(startYear: number): { start: Date; end: Date } {
@@ -27,23 +35,36 @@ function getFiscalYearOptions(): number[] {
   return Array.from({ length: 6 }, (_, i) => from + i)
 }
 
+/** If last range start is April 1, return that fiscal year (start year); else ''. */
+function initialFyFromLeakage(): number | '' {
+  const r = getLastDateRange()
+  if (!r?.from) return ''
+  const d = parseDate(r.from)
+  if (!d || Number.isNaN(d.getTime())) return ''
+  if (d.getMonth() !== 3 || d.getDate() !== 1) return ''
+  const y = d.getFullYear()
+  const opts = getFiscalYearOptions()
+  return opts.includes(y) ? y : ''
+}
+
 /**
  * Year-only fiscal year picker. Single control; FY runs April–March.
  * No Jan–Dec assumption. Max-range validation applies (full FY exceeds 30 days).
  */
 export function YearOnlyScenario() {
-  const [selectedFy, setSelectedFy] = useState<number | ''>('')
+  const [selectedFy, setSelectedFy] = useState<number | ''>(() => initialFyFromLeakage())
   const [downloadReady, setDownloadReady] = useState(false)
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const isCooldown = useDownloadCooldown([selectedFy])
+  const fySelectRef = useRef<HTMLSelectElement>(null)
 
   const range = useMemo(() => {
     if (selectedFy === '') return null
     return fiscalYearRange(selectedFy)
   }, [selectedFy])
 
-  const startInput = range ? range.start.toISOString().slice(0, 10) : ''
-  const endInput = range ? range.end.toISOString().slice(0, 10) : ''
+  const startInput = range ? formatDate(range.start) : ''
+  const endInput = range ? formatDate(range.end) : ''
 
   const validationResult = useMemo(
     () => validateRange(startInput, endInput),
@@ -52,6 +73,7 @@ export function YearOnlyScenario() {
   const resolvedStart = validationResult.range?.start ?? range?.start
   const resolvedEnd = validationResult.range?.end ?? range?.end
   const valid = validationResult.valid
+  useFocusResetOnError(valid, fySelectRef)
 
   useEffect(() => {
     if (!valid) {
@@ -73,6 +95,16 @@ export function YearOnlyScenario() {
     !generatingPdf &&
     (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
+  const hasValidationErrors = !valid && validationResult.errors.length > 0
+  const showValidationErrors = useValidationErrorDisplay(hasValidationErrors)
+  const { requireReauthBeforeSensitiveAction } = useAuth()
+
+  useEffect(() => {
+    if (!appConfig.enableStateLeakage || selectedFy === '') return
+    const { start, end } = fiscalYearRange(selectedFy)
+    setLastDateRange({ from: formatDate(start), to: formatDate(end) })
+  }, [selectedFy])
+
   return (
     <div>
       <fieldset
@@ -89,9 +121,10 @@ export function YearOnlyScenario() {
           Fiscal year (April–March)
         </legend>
         <label htmlFor="fiscal-year-select" style={{ display: 'block', marginBottom: 0 }}>
-          Choose fiscal year
+          Choose fiscal year{!appConfig.enableAntiPatterns ? ' (required)' : ''}
         </label>
         <select
+          ref={fySelectRef}
           id="fiscal-year-select"
           value={selectedFy}
           onChange={(e) =>
@@ -109,7 +142,7 @@ export function YearOnlyScenario() {
         </select>
       </fieldset>
 
-      {!valid && validationResult.errors.length > 0 && (
+      {showValidationErrors && (
         <div
           role="alert"
           data-testid="validation-errors"
@@ -128,13 +161,20 @@ export function YearOnlyScenario() {
         <button
           type="button"
           disabled={!downloadEnabled}
+          title={
+            !appConfig.enableAntiPatterns && !downloadEnabled
+              ? 'Select a valid date range to enable download'
+              : undefined
+          }
           data-testid="download-pdf"
           data-validation-valid={validationResult.valid}
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
+            const ok = await requireReauthBeforeSensitiveAction()
+            if (!ok) return
             setGeneratingPdf(true)
-            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            await chaosDelay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
             try {
               const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
               downloadPdf(bytes)
@@ -143,7 +183,8 @@ export function YearOnlyScenario() {
             }
           }}
         >
-          Download PDF
+          <DomNoiseDecorativeIcon type="download" />
+          {getBankThemeConfig().downloadButtonLabel}
         </button>
         <LoadingSpinner
           visible={

@@ -1,9 +1,11 @@
+import { parseDate } from '../../config/dateLocale'
 import type { NormalizedRange } from './types'
 
 type DateInput = Date | string | number
 
 function toDate(input: DateInput): Date {
   if (input instanceof Date) return input
+  if (typeof input === 'string') return parseDate(input)
   const d = new Date(input)
   return d
 }

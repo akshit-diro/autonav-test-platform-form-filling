@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts } from 'pdf-lib'
-import { format, addDays } from 'date-fns'
+import { addDays } from 'date-fns'
+import { formatDate } from '../config/dateLocale'
 
 /** Fixed timestamp so same inputs produce identical PDF bytes. */
 const FIXED_DATE = new Date('2020-01-01T00:00:00.000Z')
@@ -64,7 +65,7 @@ export async function generateDateRangeReport(start: Date, end: Date): Promise<U
   currentPage.drawText('Date Range Report', { x: margin, y, size: titleSize, font: fontBold })
   y -= lineHeight * 1.5
 
-  currentPage.drawText(`From: ${format(start, 'yyyy-MM-dd')}  To: ${format(end, 'yyyy-MM-dd')}`, {
+  currentPage.drawText(`From: ${formatDate(start)}  To: ${formatDate(end)}`, {
     x: margin,
     y,
     size: bodySize,
@@ -83,7 +84,7 @@ export async function generateDateRangeReport(start: Date, end: Date): Promise<U
   const transactions = getPredictableTransactions(start, end)
   for (const t of transactions) {
     const amtStr = t.amount >= 0 ? `+${t.amount.toFixed(2)}` : t.amount.toFixed(2)
-    drawLine(`${format(t.date, 'yyyy-MM-dd')}  ${t.description}  ${amtStr}`)
+    drawLine(`${formatDate(t.date)}  ${t.description}  ${amtStr}`)
   }
 
   const pdfBytes = await doc.save({ useObjectStreams: false })

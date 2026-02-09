@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
-import { DashboardNav } from '../../components/DashboardNav'
+import { DashboardLayout } from '../../components/DashboardLayout'
+import { DomNoiseDecorativeIcon } from '../../components/DomNoise'
 
 const FAKE_ACCOUNTS = [
   { id: '1', type: 'Current', last4: '4521', balance: '£12,450.00' },
@@ -19,8 +20,7 @@ export function HomePage() {
   const { user } = useAuth()
 
   return (
-    <div className="page page--dashboard">
-      <DashboardNav />
+    <DashboardLayout contentClassName="page--dashboard">
       <header className="dashboard-header">
         <h1>Accounts</h1>
         {user && (
@@ -50,6 +50,7 @@ export function HomePage() {
           className="dashboard-cta__button"
           data-testid="link-to-statements"
         >
+          <DomNoiseDecorativeIcon type="download" />
           Download statements
         </Link>
       </section>
@@ -70,6 +71,6 @@ export function HomePage() {
           ))}
         </ul>
       </section>
-    </div>
+    </DashboardLayout>
   )
 }

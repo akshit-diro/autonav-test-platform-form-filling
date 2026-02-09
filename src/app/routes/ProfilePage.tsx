@@ -1,12 +1,11 @@
 import { useAuth } from '../../auth/useAuth'
-import { DashboardNav } from '../../components/DashboardNav'
+import { DashboardLayout } from '../../components/DashboardLayout'
 
 export function ProfilePage() {
   const { user, logout } = useAuth()
 
   return (
-    <div className="page page--dashboard page--profile">
-      <DashboardNav />
+    <DashboardLayout contentClassName="page--dashboard page--profile">
       <h1>Profile</h1>
       <p className="page__description">
         Manage your account details and preferences.
@@ -19,6 +18,6 @@ export function ProfilePage() {
           Log out
         </button>
       </section>
-    </div>
+    </DashboardLayout>
   )
 }

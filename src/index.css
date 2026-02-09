@@ -232,23 +232,109 @@ body {
   max-width: 16rem;
 }
 
-/* Login page – credentials table */
-.login-credentials-table {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid var(--bank-border);
+/* Login page – collapsible credentials sidebar */
+.login-credentials-toggle {
+  display: block;
+  margin-top: 1.25rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--bank-text-muted);
+  background: none;
+  border: 1px solid var(--bank-border);
+  border-radius: var(--bank-radius);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
-.login-credentials-table__title {
+.login-credentials-toggle:hover {
+  color: var(--bank-text);
+  border-color: var(--bank-border-subtle);
+}
+
+.login-credentials-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  animation: login-sidebar-fade-in 0.2s ease;
+}
+
+@keyframes login-sidebar-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.login-credentials-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(360px, 100vw);
+  max-width: 100%;
+  height: 100vh;
+  background: var(--bank-bg);
+  border-left: 1px solid var(--bank-border);
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.12);
+  z-index: 101;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow: hidden;
+}
+
+.login-credentials-sidebar--open {
+  transform: translateX(0);
+}
+
+.login-credentials-sidebar__inner {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.login-credentials-sidebar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-shrink: 0;
+}
+
+.login-credentials-sidebar__title {
   font-size: 1rem;
   font-weight: 600;
-  margin: 0 0 0.35rem 0;
+  margin: 0;
 }
 
-.login-credentials-table__hint {
+.login-credentials-sidebar__close {
+  padding: 0.25rem 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--bank-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--bank-radius);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.login-credentials-sidebar__close:hover {
+  color: var(--bank-text);
+  background: var(--bank-bg-elevated);
+}
+
+.login-credentials-sidebar__hint {
   font-size: 0.8rem;
   color: var(--bank-text-muted);
   margin: 0 0 0.75rem 0;
+  flex-shrink: 0;
+}
+
+.login-credentials-sidebar__table-wrap {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
 }
 
 .login-credentials-table__table {

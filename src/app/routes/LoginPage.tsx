@@ -30,6 +30,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null)
   const [otpInput, setOtpInput] = useState('')
+  const [credentialsOpen, setCredentialsOpen] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -118,28 +119,70 @@ export function LoginPage() {
         </button>
       </form>
 
-      <section className="login-credentials-table" aria-label="Test credentials" data-testid="credentials-table">
-        <h2 className="login-credentials-table__title">Test credentials</h2>
-        <p className="login-credentials-table__hint">Use any row to sign in. Post-login: Accounts. Statements behaviour depends on access type.</p>
-        <table className="login-credentials-table__table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Password</th>
-              <th>Access type</th>
-            </tr>
-          </thead>
-          <tbody>
-            {credentialsList.map(({ username: u, password: p, accessNote }) => (
-              <tr key={u} data-testid={`credentials-row-${u}`}>
-                <td data-testid="cred-username">{u}</td>
-                <td data-testid="cred-password">{p}</td>
-                <td data-testid="cred-access">{accessNote}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <button
+        type="button"
+        className="login-credentials-toggle"
+        onClick={() => setCredentialsOpen((o) => !o)}
+        aria-expanded={credentialsOpen}
+        aria-controls="login-credentials-sidebar"
+        data-testid="credentials-toggle"
+      >
+        {credentialsOpen ? 'Hide test credentials' : 'Show test credentials'}
+      </button>
+
+      {credentialsOpen && (
+        <div
+          className="login-credentials-backdrop"
+          aria-hidden
+          onClick={() => setCredentialsOpen(false)}
+          data-testid="credentials-backdrop"
+        />
+      )}
+
+      <aside
+        id="login-credentials-sidebar"
+        className={`login-credentials-sidebar ${credentialsOpen ? 'login-credentials-sidebar--open' : ''}`}
+        aria-label="Test credentials"
+        data-testid="credentials-table"
+      >
+        <div className="login-credentials-sidebar__inner">
+          <div className="login-credentials-sidebar__header">
+            <h2 className="login-credentials-sidebar__title">Test credentials</h2>
+            <button
+              type="button"
+              className="login-credentials-sidebar__close"
+              onClick={() => setCredentialsOpen(false)}
+              aria-label="Close"
+              data-testid="credentials-close"
+            >
+              ×
+            </button>
+          </div>
+          <p className="login-credentials-sidebar__hint">
+            Use any row to sign in. Post-login: Accounts. Statements behaviour depends on access type.
+          </p>
+          <div className="login-credentials-sidebar__table-wrap">
+            <table className="login-credentials-table__table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Password</th>
+                  <th>Access type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {credentialsList.map(({ username: u, password: p, accessNote }) => (
+                  <tr key={u} data-testid={`credentials-row-${u}`}>
+                    <td data-testid="cred-username">{u}</td>
+                    <td data-testid="cred-password">{p}</td>
+                    <td data-testid="cred-access">{accessNote}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </aside>
     </div>
   )
 }

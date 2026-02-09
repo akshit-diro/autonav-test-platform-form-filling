@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
 import { credentials } from '../../auth/credentials'
 import type { CredentialEntry } from '../../auth/credentials'
+import { scenarioMatrix, scenarioIds } from '../../config/scenarioMatrix'
 import { UX_DELAYS } from '../../config/uxDelays'
 import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
 import { DomNoise, DomNoiseDecorativeIcon } from '../../components/DomNoise'
+
+const ADMIN_VIEWER_TESTER = ['admin', 'viewer', 'tester'] as const
 
 function getAccessNote(entry: CredentialEntry): string {
   if (entry.scenarioAgnostic) {
@@ -16,11 +19,26 @@ function getAccessNote(entry: CredentialEntry): string {
   return `Scenario-bound → ${entry.defaultScenario} only`
 }
 
-const credentialsList = Object.entries(credentials).map(([user, entry]) => ({
-  username: user,
-  password: entry.password,
-  accessNote: getAccessNote(entry),
-}))
+const adminViewerTesterList = ADMIN_VIEWER_TESTER.filter((u) => credentials[u]).map((username) => {
+  const entry = credentials[username]
+  return {
+    username,
+    password: entry.password,
+    accessNote: getAccessNote(entry),
+  }
+})
+
+const scenarioList = scenarioIds.map((scenarioId) => {
+  const entry = scenarioMatrix[scenarioId]
+  const cred = credentials[scenarioId]
+  return {
+    testScenarioId: scenarioId,
+    displayName: entry.displayName,
+    username: cred?.password != null ? scenarioId : '—',
+    password: cred?.password ?? '—',
+    route: entry.route,
+  }
+})
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -162,24 +180,52 @@ export function LoginPage() {
             Use any row to sign in. Post-login: Accounts. Statements behaviour depends on access type.
           </p>
           <div className="login-credentials-sidebar__table-wrap">
-            <table className="login-credentials-table__table">
-              <thead>
-                <tr>
-                  <th>Username</th>
-                  <th>Password</th>
-                  <th>Access type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {credentialsList.map(({ username: u, password: p, accessNote }) => (
-                  <tr key={u} data-testid={`credentials-row-${u}`}>
-                    <td data-testid="cred-username">{u}</td>
-                    <td data-testid="cred-password">{p}</td>
-                    <td data-testid="cred-access">{accessNote}</td>
+            <section className="login-credentials-section" aria-labelledby="credentials-admin-viewer-tester">
+              <h3 id="credentials-admin-viewer-tester" className="login-credentials-section__title">Admin / Viewer / Tester</h3>
+              <table className="login-credentials-table__table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Access type</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {adminViewerTesterList.map(({ username: u, password: p, accessNote }) => (
+                    <tr key={u} data-testid={`credentials-row-${u}`}>
+                      <td data-testid="cred-username">{u}</td>
+                      <td data-testid="cred-password">{p}</td>
+                      <td data-testid="cred-access">{accessNote}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+            <section className="login-credentials-section" aria-labelledby="credentials-scenarios">
+              <h3 id="credentials-scenarios" className="login-credentials-section__title">Scenarios</h3>
+              <table className="login-credentials-table__table">
+                <thead>
+                  <tr>
+                    <th>Test scenario ID</th>
+                    <th>Display name</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Route</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {scenarioList.map(({ testScenarioId, displayName, username: u, password: p, route }) => (
+                    <tr key={testScenarioId} data-testid={`credentials-scenario-row-${testScenarioId}`}>
+                      <td data-testid="cred-test-scenario-id">{testScenarioId}</td>
+                      <td data-testid="cred-scenario-display-name">{displayName}</td>
+                      <td data-testid="cred-scenario-username">{u}</td>
+                      <td data-testid="cred-scenario-password">{p}</td>
+                      <td data-testid="cred-scenario-route">{route}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
           </div>
         </div>
       </aside>

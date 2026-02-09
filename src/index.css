@@ -79,6 +79,12 @@ body {
   color: var(--bank-text-muted);
 }
 
+.bank-app .page__subtitle {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.9375rem;
+  color: var(--bank-text-muted);
+}
+
 .bank-app p {
   margin: 0 0 0.75rem 0;
   color: var(--bank-text);

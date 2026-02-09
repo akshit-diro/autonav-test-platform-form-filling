@@ -260,7 +260,7 @@ export function ScenarioPage() {
       <p>
         <Link to="/">Back to home</Link>
       </p>
-    </div>
+    </DashboardLayout>
   )
 }
 

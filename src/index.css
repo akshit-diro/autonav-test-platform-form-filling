@@ -385,6 +385,34 @@ body {
   background: var(--bank-bg);
 }
 
+/* Statements picker page – scenario table */
+.statements-picker-table {
+  width: 100%;
+  font-size: 0.9375rem;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.statements-picker-table th,
+.statements-picker-table td {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--bank-border-subtle);
+}
+
+.statements-picker-table th {
+  font-weight: 600;
+  background: var(--bank-bg-elevated);
+}
+
+.statements-picker-table tbody tr:hover {
+  background: var(--bank-bg-elevated);
+}
+
+.statements-picker-table .picker-description {
+  color: var(--bank-text-muted);
+}
+
 /* Dashboard – main nav */
 .dashboard-nav {
   display: flex;

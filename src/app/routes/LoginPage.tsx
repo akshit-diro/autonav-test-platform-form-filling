@@ -8,6 +8,7 @@ import { UX_DELAYS } from '../../config/uxDelays'
 import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
 import { DomNoise, DomNoiseDecorativeIcon } from '../../components/DomNoise'
+import { BankLogo } from '../../components/BankLogo'
 
 const ADMIN_USERNAMES = ['admin'] as const
 
@@ -80,6 +81,9 @@ export function LoginPage() {
     return (
       <div className="page page--login">
         <DomNoise placement="login" />
+        <div className="page--login__logo">
+          <BankLogo size={48} showWordmark />
+        </div>
         <h1>Verify with code</h1>
         <p>Enter the code sent to your device.</p>
         <form onSubmit={handleOtpVerify}>
@@ -107,6 +111,9 @@ export function LoginPage() {
   return (
     <div className="page page--login">
       <DomNoise placement="login" />
+      <div className="page--login__logo">
+        <BankLogo size={48} showWordmark />
+      </div>
       <h1>Sign in</h1>
       <form onSubmit={handleSubmit}>
         <div>

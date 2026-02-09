@@ -1,3 +1,4 @@
+export { BankLogo } from './BankLogo'
 export { DashboardNav } from './DashboardNav'
 export { DashboardLayout } from './DashboardLayout'
 export { DomNoise, DomNoiseDecorativeIcon } from './DomNoise'

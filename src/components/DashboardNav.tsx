@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { getStatementsNavigationPath } from '../auth/routing'
+import { BankLogo } from './BankLogo'
 
 export function DashboardNav() {
   const { user, logout } = useAuth()
@@ -14,6 +15,11 @@ export function DashboardNav() {
 
   return (
     <nav className="dashboard-nav" aria-label="Main" data-testid="dashboard-nav">
+      <div className="dashboard-nav__brand">
+        <NavLink to="/" end className="dashboard-nav__logo-link">
+          <BankLogo size={32} showWordmark />
+        </NavLink>
+      </div>
       <div className="dashboard-nav__center">
         <ul className="dashboard-nav__list">
           {items.map(({ to, label, end }) => (

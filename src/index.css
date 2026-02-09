@@ -44,6 +44,11 @@ body {
   margin: 0 auto;
 }
 
+.page--login__logo {
+  margin-bottom: 1.5rem;
+  color: var(--bank-text);
+}
+
 .page--login {
   max-width: 400px;
   margin: 4rem auto 0;
@@ -387,6 +392,23 @@ body {
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--bank-border);
+}
+
+.dashboard-nav__brand {
+  flex-shrink: 0;
+  margin-right: 1rem;
+}
+
+.dashboard-nav__logo-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--bank-text);
+  text-decoration: none;
+}
+
+.dashboard-nav__logo-link:hover {
+  color: var(--bank-primary, var(--bank-text));
+  text-decoration: none;
 }
 
 .dashboard-nav__center {
@@ -862,6 +884,17 @@ body {
   margin-bottom: 0;
   padding-bottom: 0;
   border-bottom: none;
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav__brand {
+  margin-right: 0;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--bank-border);
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav__logo-link {
+  justify-content: flex-start;
 }
 
 .bank-app--theme-b .sidebar-nav .dashboard-nav__center {

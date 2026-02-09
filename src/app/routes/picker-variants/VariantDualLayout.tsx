@@ -7,6 +7,7 @@ import { DomNoiseDecorativeIcon } from '../../../components/DomNoise'
 import { LoadingSpinner } from '../../../components/LoadingSpinner'
 import { useAuth } from '../../../auth/useAuth'
 import { useDownloadCooldown } from '../../../utils/useDownloadCooldown'
+import { useValidationErrorDisplay } from '../../../utils/useValidationErrorDisplay'
 import { getPickerAdapterComponent } from '../../../components/picker-adapters'
 import { stressConfig } from '../../../config/stressConfig'
 import { UX_DELAYS } from '../../../config/uxDelays'
@@ -30,6 +31,8 @@ export function VariantDualLayout({ pickerType }: VariantDualLayoutProps) {
   const valid = validationResult.valid
   const resolvedStart = validationResult.range?.start
   const resolvedEnd = validationResult.range?.end
+  const hasValidationErrors = !valid && validationResult.errors.length > 0
+  const showValidationErrors = useValidationErrorDisplay(hasValidationErrors)
 
   useEffect(() => {
     if (!valid) {
@@ -69,6 +72,21 @@ export function VariantDualLayout({ pickerType }: VariantDualLayoutProps) {
           }}
         />
       </div>
+
+      {showValidationErrors && (
+        <div
+          role="alert"
+          data-testid="validation-errors"
+          data-validation-errors={validationResult.errorCodes}
+          className="form-error"
+        >
+          {validationResult.errors.map((e) => (
+            <div key={e.code} data-testid={`validation-error-${e.code}`}>
+              {e.message}
+            </div>
+          ))}
+        </div>
+      )}
 
       <span style={{ display: 'inline-flex', alignItems: 'center' }}>
         <button

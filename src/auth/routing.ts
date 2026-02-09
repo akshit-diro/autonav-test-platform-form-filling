@@ -46,14 +46,15 @@ export function isScenarioBoundUser(username: string | null): boolean {
 
 /**
  * Returns where to navigate when user clicks Statements / Download statements.
- * Scenario-bound → /statements/<defaultScenario>. Scenario-agnostic → /statements (picker).
+ * Scenario-bound → path for their single allowed scenario (base or variant). Scenario-agnostic → /statements (picker).
  */
 export function getStatementsNavigationPath(username: string | null): string {
   if (!username?.trim()) return STATEMENTS_PATH_PREFIX
   const entry = credentials[username.trim()]
   if (!entry) return STATEMENTS_PATH_PREFIX
   if (entry.scenarioAgnostic) return STATEMENTS_PATH_PREFIX
-  return `${STATEMENTS_PATH_PREFIX}/${entry.defaultScenario}`
+  const scenarioId = entry.allowedScenarios[0]
+  return scenarioId ? getStatementsPathForScenario(scenarioId) : `${STATEMENTS_PATH_PREFIX}/${entry.defaultScenario}`
 }
 
 /** Builds the statements path for a scenario id (base or variant). Uses scenario route when defined. */

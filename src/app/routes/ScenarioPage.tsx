@@ -16,6 +16,7 @@ import { chaosDelay, chaosPick, chaosShuffled } from '../../utils/chaos'
 import { useAuth } from '../../auth/useAuth'
 import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
+import { useValidationErrorDisplay } from '../../utils/useValidationErrorDisplay'
 import { DashboardLayout } from '../../components/DashboardLayout'
 import { PresetsScenario } from './PresetsScenario'
 import { FromToScenario } from './FromToScenario'
@@ -59,6 +60,8 @@ function GenericScenarioContent() {
   const resolvedEnd = validationResult.range?.end
   const valid = validationResult.valid
   useFocusResetOnError(valid, startInputRef)
+  const hasValidationErrors = !valid && validationResult.errors.length > 0
+  const showValidationErrors = useValidationErrorDisplay(hasValidationErrors)
 
   useEffect(() => {
     if (!valid) {
@@ -164,6 +167,21 @@ function GenericScenarioContent() {
           ))}
         </div>
       </div>
+
+      {showValidationErrors && (
+        <div
+          role="alert"
+          data-testid="validation-errors"
+          data-validation-errors={validationResult.errorCodes}
+          className="form-error"
+        >
+          {validationResult.errors.map((e) => (
+            <div key={e.code} data-testid={`validation-error-${e.code}`}>
+              {e.message}
+            </div>
+          ))}
+        </div>
+      )}
 
       <span style={{ display: 'inline-flex', alignItems: 'center' }}>
         <button

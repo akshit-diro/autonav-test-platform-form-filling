@@ -130,12 +130,14 @@ export function FromToScenario() {
 
   async function handleFromSelect(date: Date) {
     setFromInput(formatDate(date))
+    setFromTouched(true)
     setFromPopoverOpen(false)
     await chaosDelay(stressConfig.uiDelayMs)
   }
 
   async function handleToSelect(date: Date) {
     setToInput(formatDate(date))
+    setToTouched(true)
     setToPopoverOpen(false)
     await chaosDelay(stressConfig.uiDelayMs)
   }

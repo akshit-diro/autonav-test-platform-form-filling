@@ -234,9 +234,17 @@ body {
 
 /* Dashboard – main nav */
 .dashboard-nav {
+  display: flex;
+  align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid var(--bank-border);
+}
+
+.dashboard-nav__center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
 }
 
 .dashboard-nav__list {
@@ -246,6 +254,7 @@ body {
   display: flex;
   gap: 0;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .dashboard-nav__list li {
@@ -276,6 +285,27 @@ body {
 
 .dashboard-nav__link--active:hover {
   color: var(--bank-primary-hover);
+}
+
+.dashboard-nav__logout {
+  flex-shrink: 0;
+  display: block;
+  padding: 0.5rem 1rem;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--bank-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--bank-radius);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.dashboard-nav__logout:hover {
+  color: var(--bank-text);
+  background-color: var(--bank-bg);
 }
 
 /* Dashboard – header */
@@ -680,9 +710,15 @@ body {
 }
 
 .bank-app--theme-b .sidebar-nav .dashboard-nav {
+  flex-direction: column;
+  align-items: stretch;
   margin-bottom: 0;
   padding-bottom: 0;
   border-bottom: none;
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav__center {
+  flex: 1;
 }
 
 .bank-app--theme-b .sidebar-nav .dashboard-nav__list {
@@ -692,6 +728,12 @@ body {
 
 .bank-app--theme-b .sidebar-nav .dashboard-nav__link {
   margin-right: 0;
+  padding: 0.5rem 0.75rem;
+}
+
+.bank-app--theme-b .sidebar-nav .dashboard-nav__logout {
+  margin-right: 0;
+  margin-top: auto;
   padding: 0.5rem 0.75rem;
 }
 

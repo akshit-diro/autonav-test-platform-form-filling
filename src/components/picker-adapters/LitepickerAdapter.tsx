@@ -64,7 +64,10 @@ export function LitepickerAdapter({
       maxDate: maxDate ?? undefined,
       autoApply: true,
       setup(pickerInstance: InstanceType<typeof Litepicker>) {
-        pickerInstance.on('selected', (date1: unknown, date2?: unknown) => {
+        // Litepicker extends EventEmitter at runtime; package types omit .on()
+        ;(pickerInstance as unknown as { on(event: string, listener: (...args: unknown[]) => void): void }).on(
+          'selected',
+          (date1: unknown, date2?: unknown) => {
           if (skipSelectedRef.current) {
             skipSelectedRef.current = false
             return

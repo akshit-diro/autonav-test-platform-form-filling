@@ -385,12 +385,23 @@ body {
   background: var(--bank-bg);
 }
 
-/* Statements picker page – scenario table */
+/* Statements picker page – scenario tables by group */
+.statements-picker-group {
+  margin-bottom: 2rem;
+}
+
+.statements-picker-group__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+  color: var(--bank-text);
+}
+
 .statements-picker-table {
   width: 100%;
   font-size: 0.9375rem;
   border-collapse: collapse;
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .statements-picker-table th,

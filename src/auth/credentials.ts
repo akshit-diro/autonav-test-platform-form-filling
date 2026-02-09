@@ -13,7 +13,7 @@ export interface CredentialEntry {
   /** Default date-picker scenario (used when user is scenario-bound for Statements link). */
   defaultScenario: DatePickerScenarioId
   /**
-   * When true: user is scenario-agnostic (admin, viewer, tester). Statements → picker page.
+   * When true: user is scenario-agnostic (admin). Statements → picker page.
    * When false/omitted: user is scenario-bound. Statements → direct to defaultScenario.
    */
   scenarioAgnostic?: boolean
@@ -34,32 +34,6 @@ export const credentials: CredentialsMap = {
       'inline-calendar',
     ],
     defaultScenario: 'presets',
-    scenarioAgnostic: true,
-  },
-  viewer: {
-    password: 'viewer123',
-    allowedScenarios: [
-      'presets',
-      'from-to',
-      'dual-calendar',
-      'month-year',
-      'year-only',
-      'inline-calendar',
-    ],
-    defaultScenario: 'from-to',
-    scenarioAgnostic: true,
-  },
-  tester: {
-    password: 'tester123',
-    allowedScenarios: [
-      'presets',
-      'from-to',
-      'dual-calendar',
-      'month-year',
-      'year-only',
-      'inline-calendar',
-    ],
-    defaultScenario: 'dual-calendar',
     scenarioAgnostic: true,
   },
   presets: {

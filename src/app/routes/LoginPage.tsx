@@ -9,7 +9,7 @@ import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
 import { DomNoise, DomNoiseDecorativeIcon } from '../../components/DomNoise'
 
-const ADMIN_VIEWER_TESTER = ['admin', 'viewer', 'tester'] as const
+const ADMIN_USERNAMES = ['admin'] as const
 
 function getAccessNote(entry: CredentialEntry): string {
   if (entry.scenarioAgnostic) {
@@ -19,7 +19,7 @@ function getAccessNote(entry: CredentialEntry): string {
   return `Scenario-bound → ${entry.defaultScenario} only`
 }
 
-const adminViewerTesterList = ADMIN_VIEWER_TESTER.filter((u) => credentials[u]).map((username) => {
+const adminUserList = ADMIN_USERNAMES.filter((u) => credentials[u]).map((username) => {
   const entry = credentials[username]
   return {
     username,
@@ -28,11 +28,12 @@ const adminViewerTesterList = ADMIN_VIEWER_TESTER.filter((u) => credentials[u]).
   }
 })
 
-const scenarioList = scenarioIds.map((scenarioId) => {
+const scenarioList = scenarioIds.map((scenarioId, index) => {
   const entry = scenarioMatrix[scenarioId]
   const cred = credentials[scenarioId]
   return {
-    testScenarioId: scenarioId,
+    testScenarioId: `DS${index + 1}`,
+    scenarioId,
     displayName: entry.displayName,
     username: cred?.password != null ? scenarioId : '—',
     password: cred?.password ?? '—',
@@ -180,27 +181,6 @@ export function LoginPage() {
             Use any row to sign in. Post-login: Accounts. Statements behaviour depends on access type.
           </p>
           <div className="login-credentials-sidebar__table-wrap">
-            <section className="login-credentials-section" aria-labelledby="credentials-admin-viewer-tester">
-              <h3 id="credentials-admin-viewer-tester" className="login-credentials-section__title">Admin / Viewer / Tester</h3>
-              <table className="login-credentials-table__table">
-                <thead>
-                  <tr>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>Access type</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {adminViewerTesterList.map(({ username: u, password: p, accessNote }) => (
-                    <tr key={u} data-testid={`credentials-row-${u}`}>
-                      <td data-testid="cred-username">{u}</td>
-                      <td data-testid="cred-password">{p}</td>
-                      <td data-testid="cred-access">{accessNote}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </section>
             <section className="login-credentials-section" aria-labelledby="credentials-scenarios">
               <h3 id="credentials-scenarios" className="login-credentials-section__title">Scenarios</h3>
               <table className="login-credentials-table__table">
@@ -221,6 +201,27 @@ export function LoginPage() {
                       <td data-testid="cred-scenario-username">{u}</td>
                       <td data-testid="cred-scenario-password">{p}</td>
                       <td data-testid="cred-scenario-route">{route}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+            <section className="login-credentials-section" aria-labelledby="credentials-admin">
+              <h3 id="credentials-admin" className="login-credentials-section__title">Admin</h3>
+              <table className="login-credentials-table__table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Access type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminUserList.map(({ username: u, password: p, accessNote }) => (
+                    <tr key={u} data-testid={`credentials-row-${u}`}>
+                      <td data-testid="cred-username">{u}</td>
+                      <td data-testid="cred-password">{p}</td>
+                      <td data-testid="cred-access">{accessNote}</td>
                     </tr>
                   ))}
                 </tbody>

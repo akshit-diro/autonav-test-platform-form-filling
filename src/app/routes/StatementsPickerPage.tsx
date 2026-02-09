@@ -5,7 +5,7 @@ import { getStatementsPathForScenario } from '../../auth/routing'
 import { DashboardLayout } from '../../components/DashboardLayout'
 
 /**
- * Shown when a scenario-agnostic user (admin, viewer, tester) goes to /statements.
+ * Shown when a scenario-agnostic user (admin) goes to /statements.
  * Lists date-picker scenarios they are allowed to access; no redirect.
  */
 export function StatementsPickerPage() {

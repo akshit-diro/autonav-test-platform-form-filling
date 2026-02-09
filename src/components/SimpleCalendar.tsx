@@ -26,6 +26,8 @@ export interface SimpleCalendarProps {
   onSelectDay: (date: Date) => void
   /** When provided, dates for which this returns true are disabled (e.g. for stress testing). */
   isDayDisabled?: (date: Date) => boolean
+  /** Override for root data-testid (e.g. "calendar-start", "calendar-end" for dual calendar). */
+  calendarTestId?: string
 }
 
 /**
@@ -39,6 +41,7 @@ export function SimpleCalendar({
   end,
   onSelectDay,
   isDayDisabled,
+  calendarTestId = 'calendar',
 }: SimpleCalendarProps) {
   const monthStart = startOfMonth(month)
   const monthEnd = endOfMonth(month)
@@ -65,7 +68,7 @@ export function SimpleCalendar({
   }
 
   return (
-    <div data-testid="calendar" role="application" aria-label="Calendar">
+    <div data-testid={calendarTestId} role="application" aria-label="Calendar">
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
         <button
           type="button"

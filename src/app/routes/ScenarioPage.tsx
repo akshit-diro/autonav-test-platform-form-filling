@@ -8,6 +8,11 @@ import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
 import { PresetsScenario } from './PresetsScenario'
 import { FromToScenario } from './FromToScenario'
+import { DualCalendarScenario } from './DualCalendarScenario'
+import { MonthYearScenario } from './MonthYearScenario'
+import { YearOnlyScenario } from './YearOnlyScenario'
+import { MobileWheelScenario } from './MobileWheelScenario'
+import { InlineCalendarScenario } from './InlineCalendarScenario'
 
 /** Placeholder preset ids for data-testid and future behavior. */
 const PRESETS = [
@@ -151,6 +156,11 @@ export function ScenarioPage() {
 
   const isPresets = scenarioId === 'presets'
   const isFromTo = scenarioId === 'from-to'
+  const isDualCalendar = scenarioId === 'dual-calendar'
+  const isMonthYear = scenarioId === 'month-year'
+  const isYearOnly = scenarioId === 'year-only'
+  const isMobileWheel = scenarioId === 'mobile-wheel'
+  const isInlineCalendar = scenarioId === 'inline-calendar'
 
   return (
     <div>
@@ -159,7 +169,14 @@ export function ScenarioPage() {
 
       {isPresets && <PresetsScenario />}
       {isFromTo && <FromToScenario />}
-      {!isPresets && !isFromTo && <GenericScenarioContent scenarioId={scenarioId!} />}
+      {isDualCalendar && <DualCalendarScenario />}
+      {isMonthYear && <MonthYearScenario />}
+      {isYearOnly && <YearOnlyScenario />}
+      {isMobileWheel && <MobileWheelScenario />}
+      {isInlineCalendar && <InlineCalendarScenario />}
+      {!isPresets && !isFromTo && !isDualCalendar && !isMonthYear && !isYearOnly && !isMobileWheel && !isInlineCalendar && (
+        <GenericScenarioContent scenarioId={scenarioId!} />
+      )}
 
       <p>
         <Link to="/">Back to home</Link>

@@ -17,6 +17,7 @@ import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
 import { runPickerScenario } from '../../scenario-engine'
 import type { ExecutionResult } from '../../scenario-engine'
+import { DashboardLayout } from '../../components/DashboardLayout'
 import { PresetsScenario } from './PresetsScenario'
 import { FromToScenario } from './FromToScenario'
 import { DualCalendarScenario } from './DualCalendarScenario'
@@ -218,10 +219,11 @@ export function ScenarioPage() {
 
   if (!scenario) {
     return (
-      <div>
+      <DashboardLayout contentClassName="page--statements">
+        <h1>Download statements</h1>
         <p>Scenario not found.</p>
         <Link to="/">Go to home</Link>
-      </div>
+      </DashboardLayout>
     )
   }
 
@@ -234,10 +236,12 @@ export function ScenarioPage() {
   const isPickerVariant = Boolean(scenario.metadata?.pickerType)
 
   return (
-    <div className="page page--statement">
+    <DashboardLayout contentClassName="page page--statement page--statements">
       <DomNoise placement="statement" />
-      <h1>{scenario.displayName}</h1>
-      <p className="page__description">{scenario.description}</p>
+      <h1>Download statements</h1>
+      <p className="page__subtitle" data-testid="statements-instruction">
+        Select your date range below, then click Download to get your statement as a PDF.
+      </p>
 
       {isPresets && <PresetsScenario />}
       {isFromTo && <FromToScenario />}

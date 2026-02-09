@@ -4,7 +4,9 @@ import { Router } from './app/Router'
 function App() {
   return (
     <AuthProvider>
-      <Router />
+      <div className="bank-app">
+        <Router />
+      </div>
     </AuthProvider>
   )
 }

@@ -1,6 +1,570 @@
+/* Banking-style theme: conservative, enterprise, clean */
+
+:root {
+  --bank-bg: #f6f7f9;
+  --bank-bg-elevated: #ffffff;
+  --bank-border: #d4d8dc;
+  --bank-border-subtle: #e5e8eb;
+  --bank-text: #1f2933;
+  --bank-text-muted: #52606d;
+  --bank-primary: #0d5c2e;
+  --bank-primary-hover: #0a4a24;
+  --bank-primary-disabled: #94a3b0;
+  --bank-error: #991b1b;
+  --bank-error-bg: #fef2f2;
+  --bank-radius: 4px;
+  --bank-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --bank-font: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 * {
   box-sizing: border-box;
 }
+
 body {
   margin: 0;
+  font-family: var(--bank-font);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--bank-text);
+  background-color: var(--bank-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+.bank-app {
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+/* Page layout */
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.page--login {
+  max-width: 400px;
+  margin: 4rem auto 0;
+}
+
+.page--dashboard {
+  max-width: 640px;
+}
+
+.page--statement {
+  max-width: 720px;
+}
+
+/* Typography */
+.bank-app h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--bank-text);
+}
+
+.bank-app h2 {
+  margin: 1.5rem 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--bank-text);
+}
+
+.bank-app .page__description {
+  margin: 0 0 1.25rem 0;
+  font-size: 0.9375rem;
+  color: var(--bank-text-muted);
+}
+
+.bank-app p {
+  margin: 0 0 0.75rem 0;
+  color: var(--bank-text);
+}
+
+/* Links */
+.bank-app a {
+  color: var(--bank-primary);
+  text-decoration: none;
+}
+
+.bank-app a:hover {
+  text-decoration: underline;
+}
+
+/* Forms */
+.bank-app label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--bank-text);
+}
+
+.bank-app input[type="text"],
+.bank-app input[type="password"],
+.bank-app input[type="date"],
+.bank-app select {
+  width: 100%;
+  max-width: 16rem;
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  color: var(--bank-text);
+  background-color: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border);
+  border-radius: var(--bank-radius);
+  transition: border-color 0.15s ease;
+}
+
+.bank-app input:hover,
+.bank-app select:hover {
+  border-color: var(--bank-text-muted);
+}
+
+.bank-app input:focus,
+.bank-app select:focus {
+  outline: none;
+  border-color: var(--bank-primary);
+  box-shadow: 0 0 0 2px rgba(13, 92, 46, 0.15);
+}
+
+.bank-app input:disabled,
+.bank-app select:disabled {
+  background-color: var(--bank-bg);
+  color: var(--bank-text-muted);
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.bank-app input::placeholder {
+  color: var(--bank-text-muted);
+}
+
+.bank-app input[aria-invalid="true"],
+.bank-app select[aria-invalid="true"] {
+  border-color: var(--bank-error);
+}
+
+/* Form groups */
+.bank-app form > div,
+.bank-app [data-testid="date-range-inputs"] > div,
+.bank-app [aria-label="Date range inputs"] > div {
+  margin-bottom: 1rem;
+}
+
+/* Buttons */
+.bank-app button {
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: var(--bank-radius);
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.bank-app button[type="submit"],
+.bank-app button:not([type="button"]):not([disabled]) {
+  color: var(--bank-bg-elevated);
+  background-color: var(--bank-primary);
+  border: 1px solid var(--bank-primary);
+}
+
+.bank-app button[type="submit"]:hover:not(:disabled),
+.bank-app button:not([type="button"]):hover:not(:disabled) {
+  background-color: var(--bank-primary-hover);
+  border-color: var(--bank-primary-hover);
+}
+
+.bank-app button[type="button"] {
+  color: var(--bank-text);
+  background-color: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border);
+}
+
+.bank-app button[type="button"]:hover:not(:disabled) {
+  background-color: var(--bank-bg);
+  border-color: var(--bank-text-muted);
+}
+
+.bank-app button:disabled {
+  background-color: var(--bank-bg);
+  border-color: var(--bank-border);
+  color: var(--bank-primary-disabled);
+  cursor: not-allowed;
+}
+
+.bank-app button[type="submit"]:disabled,
+.bank-app button[data-testid="download-pdf"]:disabled {
+  background-color: var(--bank-primary-disabled);
+  border-color: var(--bank-primary-disabled);
+  color: var(--bank-bg-elevated);
+}
+
+/* Validation errors */
+.bank-app .form-error,
+.bank-app [role="alert"],
+.bank-app [data-testid^="validation-error"] {
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--bank-error);
+}
+
+.bank-app [data-testid="validation-error-from"],
+.bank-app [data-testid="validation-error-to"],
+.bank-app [data-testid="validation-errors"] {
+  padding: 0.5rem 0;
+}
+
+/* Login page */
+.page--login form {
+  padding: 1.5rem 0;
+}
+
+.page--login button[type="submit"] {
+  margin-top: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  width: 100%;
+  max-width: 16rem;
+}
+
+/* Dashboard – main nav */
+.dashboard-nav {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--bank-border);
+}
+
+.dashboard-nav__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.dashboard-nav__list li {
+  margin: 0;
+}
+
+.dashboard-nav__link {
+  display: block;
+  padding: 0.5rem 1rem;
+  margin-right: 0.25rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--bank-text-muted);
+  text-decoration: none;
+  border-radius: var(--bank-radius);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.dashboard-nav__link:hover {
+  color: var(--bank-text);
+  background-color: var(--bank-bg);
+}
+
+.dashboard-nav__link--active {
+  color: var(--bank-primary);
+  background-color: var(--bank-bg);
+}
+
+.dashboard-nav__link--active:hover {
+  color: var(--bank-primary-hover);
+}
+
+/* Dashboard – header */
+.dashboard-header {
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-header__user {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9375rem;
+  color: var(--bank-text-muted);
+}
+
+/* Dashboard – account cards */
+.account-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.account-card {
+  padding: 1rem;
+  background: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border-subtle);
+  border-radius: var(--bank-radius);
+}
+
+.account-card__type {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bank-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.25rem;
+}
+
+.account-card__number {
+  font-size: 0.875rem;
+  color: var(--bank-text);
+  margin-bottom: 0.5rem;
+}
+
+.account-card__balance {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--bank-text);
+}
+
+/* Dashboard – CTA to statements */
+.dashboard-cta {
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-cta__button {
+  display: inline-block;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--bank-bg-elevated);
+  background-color: var(--bank-primary);
+  border: 1px solid var(--bank-primary);
+  border-radius: var(--bank-radius);
+  text-decoration: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.dashboard-cta__button:hover {
+  background-color: var(--bank-primary-hover);
+  border-color: var(--bank-primary-hover);
+  color: var(--bank-bg-elevated);
+}
+
+/* Dashboard – recent activity */
+.recent-activity {
+  padding-top: 1rem;
+  border-top: 1px solid var(--bank-border-subtle);
+}
+
+.recent-activity h2 {
+  margin: 0 0 0.75rem 0;
+}
+
+.recent-activity__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recent-activity__item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--bank-border-subtle);
+  font-size: 0.9375rem;
+}
+
+.recent-activity__item:last-child {
+  border-bottom: none;
+}
+
+.recent-activity__desc {
+  color: var(--bank-text);
+}
+
+.recent-activity__amount {
+  font-weight: 500;
+  color: var(--bank-text);
+}
+
+.recent-activity__date {
+  font-size: 0.875rem;
+  color: var(--bank-text-muted);
+}
+
+/* Statements page – statement type list */
+.statement-type-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.statement-type-list li {
+  margin-bottom: 0.75rem;
+}
+
+.statement-type-card {
+  display: block;
+  padding: 1rem 1.25rem;
+  background: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border-subtle);
+  border-radius: var(--bank-radius);
+  text-decoration: none;
+  color: var(--bank-text);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.statement-type-card:hover {
+  border-color: var(--bank-border);
+  background: var(--bank-bg);
+}
+
+.statement-type-card__title {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  margin-bottom: 0.25rem;
+}
+
+.statement-type-card__desc {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--bank-text-muted);
+}
+
+/* Profile page */
+.profile-placeholder {
+  padding: 1rem 0;
+}
+
+.page--dashboard strong {
+  font-weight: 600;
+}
+
+/* Inactivity warning (session timeout) */
+.inactivity-warning {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border);
+  border-radius: var(--bank-radius);
+  box-shadow: var(--bank-shadow);
+  max-width: 90vw;
+}
+
+.inactivity-warning__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--bank-text);
+}
+
+.inactivity-warning__button {
+  flex-shrink: 0;
+}
+
+/* Statement pages */
+.page--statement > p:last-of-type {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--bank-border-subtle);
+  font-size: 0.875rem;
+}
+
+/* Preset / action button groups */
+.bank-app [data-testid="preset-buttons"],
+.bank-app [data-testid="dual-calendar-container"],
+.bank-app [data-testid="mobile-wheel-picker"],
+.bank-app [data-testid="month-year-picker"],
+.bank-app [data-testid="fiscal-year-picker"] {
+  margin-bottom: 1rem;
+}
+
+.bank-app [data-testid="preset-buttons"] button {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Calendar popover (overrides inline styles for theme) */
+.bank-app [role="dialog"][aria-label="Choose date"] {
+  background: var(--bank-bg-elevated) !important;
+  border: 1px solid var(--bank-border) !important;
+  border-radius: var(--bank-radius) !important;
+  box-shadow: var(--bank-shadow) !important;
+}
+
+/* Calendar grid */
+.bank-app [role="application"][aria-label="Calendar"] {
+  background: var(--bank-bg-elevated);
+  border: 1px solid var(--bank-border-subtle);
+  border-radius: var(--bank-radius);
+  padding: 0.75rem;
+}
+
+.bank-app [role="application"][aria-label="Calendar"] [role="grid"] {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.bank-app [role="application"][aria-label="Calendar"] th {
+  padding: 0.35rem 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--bank-text-muted);
+  text-align: center;
+}
+
+.bank-app [role="application"][aria-label="Calendar"] td {
+  padding: 2px;
+  text-align: center;
+}
+
+.bank-app [role="application"][aria-label="Calendar"] td button {
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.25rem;
+  border-radius: var(--bank-radius);
+  border: 1px solid var(--bank-border-subtle);
+  background: transparent;
+}
+
+.bank-app [role="application"][aria-label="Calendar"] td button:hover:not(:disabled) {
+  background: var(--bank-bg);
+  border-color: var(--bank-border);
+}
+
+.bank-app [role="application"][aria-label="Calendar"] td button:disabled {
+  opacity: 0.5;
+}
+
+/* Fieldset (fiscal year) */
+.bank-app fieldset {
+  border: 1px solid var(--bank-border);
+  border-radius: var(--bank-radius);
+  padding: 1rem 1.25rem;
+  background: var(--bank-bg-elevated);
+}
+
+.bank-app fieldset legend {
+  padding: 0 0.25rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--bank-text);
+}
+
+/* Loading spinner */
+.bank-app [data-testid="download-loading-spinner"] {
+  font-size: 0.875rem;
+  color: var(--bank-text-muted);
+}
+
+/* Wheel column (mobile) */
+.bank-app [data-testid^="wheel-column"] {
+  border-color: var(--bank-border) !important;
+  border-radius: var(--bank-radius);
 }

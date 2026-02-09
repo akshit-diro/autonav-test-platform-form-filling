@@ -1,10 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
 import { endOfMonth } from 'date-fns'
-import { RangeInspector } from '../../components/RangeInspector'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
+import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 
 /** Fiscal year: April (year) to March (year+1). Returns start and end dates. */
 function fiscalYearRange(startYear: number): { start: Date; end: Date } {
@@ -32,6 +34,8 @@ function getFiscalYearOptions(): number[] {
 export function YearOnlyScenario() {
   const [selectedFy, setSelectedFy] = useState<number | ''>('')
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([selectedFy])
 
   const range = useMemo(() => {
     if (selectedFy === '') return null
@@ -63,7 +67,11 @@ export function YearOnlyScenario() {
     return () => clearTimeout(t)
   }, [valid])
 
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   return (
     <div>
@@ -106,7 +114,7 @@ export function YearOnlyScenario() {
           role="alert"
           data-testid="validation-errors"
           data-validation-errors={validationResult.errorCodes}
-          style={{ fontSize: '0.875rem', color: '#b00', marginBottom: '0.5rem' }}
+          className="form-error"
         >
           {validationResult.errors.map((e) => (
             <div key={e.code} data-testid={`validation-error-${e.code}`}>
@@ -125,23 +133,25 @@ export function YearOnlyScenario() {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
-            const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={resolvedStart ?? undefined}
-        resolvedEnd={resolvedEnd ?? undefined}
-        scenarioId="year-only"
-        validationResult={validationResult}
-      />
     </div>
   )
 }

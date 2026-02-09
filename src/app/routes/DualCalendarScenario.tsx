@@ -1,11 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
-import { RangeInspector } from '../../components/RangeInspector'
 import { SimpleCalendar } from '../../components/SimpleCalendar'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
 import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { isDateDisabledAfterSelection } from '../../utils/stressDisabledDates'
 
 /**
@@ -18,6 +19,8 @@ export function DualCalendarScenario() {
   const [leftMonth, setLeftMonth] = useState(() => new Date())
   const [rightMonth, setRightMonth] = useState(() => new Date())
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([startDate, endDate])
 
   const startInput = startDate ? startDate.toISOString().slice(0, 10) : ''
   const endInput = endDate ? endDate.toISOString().slice(0, 10) : ''
@@ -57,7 +60,11 @@ export function DualCalendarScenario() {
   const showDisabledDatesStress =
     stressConfig.disabledDatesChangeAfterSelection && (startDate != null || endDate != null)
   const isDayDisabled = showDisabledDatesStress ? isDateDisabledAfterSelection : undefined
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   return (
     <div>
@@ -100,7 +107,7 @@ export function DualCalendarScenario() {
           role="alert"
           data-testid="validation-errors"
           data-validation-errors={validationResult.errorCodes}
-          style={{ fontSize: '0.875rem', color: '#b00', marginBottom: '0.5rem' }}
+          className="form-error"
         >
           {validationResult.errors.map((e) => (
             <div key={e.code} data-testid={`validation-error-${e.code}`}>
@@ -119,23 +126,25 @@ export function DualCalendarScenario() {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
-            const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={resolvedStart ?? undefined}
-        resolvedEnd={resolvedEnd ?? undefined}
-        scenarioId="dual-calendar"
-        validationResult={validationResult}
-      />
     </div>
   )
 }

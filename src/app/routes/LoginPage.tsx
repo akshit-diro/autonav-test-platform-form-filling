@@ -1,6 +1,8 @@
 import { useState, FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
+import { UX_DELAYS } from '../../config/uxDelays'
+import { delay } from '../../utils/delay'
 
 export function LoginPage() {
   const navigate = useNavigate()
@@ -9,11 +11,12 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
     const result = login(username.trim(), password)
     if (result.success && result.defaultRedirect) {
+      await delay(UX_DELAYS.DELAY_BEFORE_NAVIGATE_AFTER_LOGIN_MS)
       navigate(result.defaultRedirect, { replace: true })
     } else {
       setError('Invalid username or password.')
@@ -21,8 +24,8 @@ export function LoginPage() {
   }
 
   return (
-    <div>
-      <h1>Login</h1>
+    <div className="page page--login">
+      <h1>Sign in</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="username">Username</label>

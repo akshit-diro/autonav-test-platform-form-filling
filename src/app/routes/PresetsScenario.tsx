@@ -1,12 +1,13 @@
 import { useMemo, useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import { RangeInspector } from '../../components/RangeInspector'
 import { SimpleCalendar } from '../../components/SimpleCalendar'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import { validateRange, presetFns, type PresetId } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
 import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { isDateDisabledAfterSelection } from '../../utils/stressDisabledDates'
 
 const PRESETS: { id: PresetId; label: string }[] = [
@@ -24,6 +25,8 @@ export function PresetsScenario() {
   const [calendarMonth, setCalendarMonth] = useState(() => new Date())
   const [pendingEnd, setPendingEnd] = useState<Date | null>(null)
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([startInput, endInput])
 
   const validationResult = useMemo(
     () => validateRange(startInput, endInput),
@@ -81,7 +84,11 @@ export function PresetsScenario() {
   const showDisabledDatesStress =
     stressConfig.disabledDatesChangeAfterSelection && (resolvedStart != null || pendingEnd != null)
   const isDayDisabled = showDisabledDatesStress ? isDateDisabledAfterSelection : undefined
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   return (
     <div>
@@ -128,23 +135,25 @@ export function PresetsScenario() {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
-            const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={resolvedStart}
-        resolvedEnd={resolvedEnd}
-        scenarioId="presets"
-        validationResult={validationResult}
-      />
     </div>
   )
 }

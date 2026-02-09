@@ -1,9 +1,9 @@
 import { useMemo, useState, useEffect } from 'react'
 import { format } from 'date-fns'
-import { RangeInspector } from '../../components/RangeInspector'
 import { CalendarPopover } from '../../components/CalendarPopover'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import {
   validateRange,
   DATE_RANGE_ERROR_CODES,
@@ -11,6 +11,7 @@ import {
 } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
 import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { isDateDisabledAfterSelection } from '../../utils/stressDisabledDates'
 
 const FROM_ERROR_CODES = [
@@ -37,6 +38,8 @@ export function FromToScenario() {
   const [fromPopoverOpen, setFromPopoverOpen] = useState(false)
   const [toPopoverOpen, setToPopoverOpen] = useState(false)
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([fromInput, toInput])
 
   const validationResult = useMemo(
     () => validateRange(fromInput, toInput),
@@ -83,7 +86,11 @@ export function FromToScenario() {
   const showDisabledDatesStress =
     stressConfig.disabledDatesChangeAfterSelection && (fromInput !== '' || toInput !== '')
   const isDayDisabled = showDisabledDatesStress ? isDateDisabledAfterSelection : undefined
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   return (
     <div>
@@ -124,7 +131,7 @@ export function FromToScenario() {
               role="alert"
               data-testid="validation-error-from"
               data-validation-errors={fromErrors.map((e) => e.code).join(' ')}
-              style={{ fontSize: '0.875rem', color: '#b00', marginTop: 2 }}
+              className="form-error"
             >
               {fromErrors.map((e) => (
                 <div key={e.code} data-testid={`validation-error-${e.code}`}>
@@ -171,7 +178,7 @@ export function FromToScenario() {
               role="alert"
               data-testid="validation-error-to"
               data-validation-errors={toErrors.map((e) => e.code).join(' ')}
-              style={{ fontSize: '0.875rem', color: '#b00', marginTop: 2 }}
+              className="form-error"
             >
               {toErrors.map((e) => (
                 <div key={e.code} data-testid={`validation-error-${e.code}`}>
@@ -192,23 +199,25 @@ export function FromToScenario() {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
-            const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={resolvedStart}
-        resolvedEnd={resolvedEnd}
-        scenarioId="from-to"
-        validationResult={validationResult}
-      />
     </div>
   )
 }

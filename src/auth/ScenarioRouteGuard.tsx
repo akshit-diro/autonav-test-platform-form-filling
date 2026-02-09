@@ -1,6 +1,7 @@
 import { Navigate, Outlet, useParams } from 'react-router-dom'
 import { getScenario } from '../config/scenarioMatrix'
 import { useAuth } from './useAuth'
+import { InactivityGuard } from './InactivityGuard'
 
 /**
  * Guards /scenario/:scenarioId routes.
@@ -24,5 +25,9 @@ export function ScenarioRouteGuard() {
     return <Navigate to="/not-authorized" replace />
   }
 
-  return <Outlet />
+  return (
+    <InactivityGuard>
+      <Outlet />
+    </InactivityGuard>
+  )
 }

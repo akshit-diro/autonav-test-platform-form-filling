@@ -6,6 +6,8 @@ import { LoginPage } from './LoginPage'
 import { NotAuthorizedPage } from './NotAuthorizedPage'
 import { AdminPage } from './AdminPage'
 import { ScenarioPage } from './ScenarioPage'
+import { StatementsPage } from './StatementsPage'
+import { ProfilePage } from './ProfilePage'
 
 export const routes: RouteObject[] = [
   {
@@ -23,6 +25,14 @@ export const routes: RouteObject[] = [
       {
         index: true,
         element: <HomePage />,
+      },
+      {
+        path: 'statements',
+        element: <StatementsPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
     ],
   },

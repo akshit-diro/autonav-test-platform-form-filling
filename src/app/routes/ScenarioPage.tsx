@@ -1,11 +1,13 @@
 import { useMemo, useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getScenario } from '../../config/scenarioMatrix'
-import { RangeInspector } from '../../components/RangeInspector'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
+import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { PresetsScenario } from './PresetsScenario'
 import { FromToScenario } from './FromToScenario'
 import { DualCalendarScenario } from './DualCalendarScenario'
@@ -21,10 +23,12 @@ const PRESETS = [
   { id: 'this-month', label: 'This month' },
 ] as const
 
-function GenericScenarioContent({ scenarioId }: { scenarioId: string }) {
+function GenericScenarioContent() {
   const [startInput, setStartInput] = useState('')
   const [endInput, setEndInput] = useState('')
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([startInput, endInput])
 
   const validationResult = useMemo(
     () => validateRange(startInput, endInput),
@@ -48,7 +52,11 @@ function GenericScenarioContent({ scenarioId }: { scenarioId: string }) {
     return () => clearTimeout(t)
   }, [valid])
 
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   return (
     <>
@@ -120,23 +128,25 @@ function GenericScenarioContent({ scenarioId }: { scenarioId: string }) {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
-            const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={resolvedStart}
-        resolvedEnd={resolvedEnd}
-        scenarioId={scenarioId}
-        validationResult={validationResult}
-      />
     </>
   )
 }
@@ -163,9 +173,9 @@ export function ScenarioPage() {
   const isInlineCalendar = scenarioId === 'inline-calendar'
 
   return (
-    <div>
+    <div className="page page--statement">
       <h1>{scenario.displayName}</h1>
-      <p>{scenario.description}</p>
+      <p className="page__description">{scenario.description}</p>
 
       {isPresets && <PresetsScenario />}
       {isFromTo && <FromToScenario />}
@@ -175,7 +185,7 @@ export function ScenarioPage() {
       {isMobileWheel && <MobileWheelScenario />}
       {isInlineCalendar && <InlineCalendarScenario />}
       {!isPresets && !isFromTo && !isDualCalendar && !isMonthYear && !isYearOnly && !isMobileWheel && !isInlineCalendar && (
-        <GenericScenarioContent scenarioId={scenarioId!} />
+        <GenericScenarioContent />
       )}
 
       <p>

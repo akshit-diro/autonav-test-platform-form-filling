@@ -1,10 +1,12 @@
 import { useMemo, useState, useEffect, useCallback } from 'react'
-import { RangeInspector } from '../../components/RangeInspector'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { WheelColumn } from '../../components/WheelColumn'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
+import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 
 const MONTH_LABELS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -34,6 +36,8 @@ export function MobileWheelScenario() {
   const [month, setMonth] = useState(6)
   const [year, setYear] = useState(new Date().getFullYear())
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([day, month, year])
 
   const resolvedDate = useMemo(() => {
     const d = clampDay(day, month, year)
@@ -63,7 +67,11 @@ export function MobileWheelScenario() {
     return () => clearTimeout(t)
   }, [valid])
 
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   const dayOptions = useMemo(
     () => Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: String(i + 1) })),
@@ -136,7 +144,7 @@ export function MobileWheelScenario() {
           role="alert"
           data-testid="validation-errors"
           data-validation-errors={validationResult.errorCodes}
-          style={{ fontSize: '0.875rem', color: '#b00', marginBottom: '0.5rem' }}
+          className="form-error"
         >
           {validationResult.errors.map((e) => (
             <div key={e.code} data-testid={`validation-error-${e.code}`}>
@@ -155,24 +163,26 @@ export function MobileWheelScenario() {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !validationResult.range) return
-            const { start, end } = validationResult.range
-            const bytes = await generateDateRangeReport(start, end)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const { start, end } = validationResult.range
+              const bytes = await generateDateRangeReport(start, end)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={validationResult.range?.start}
-        resolvedEnd={validationResult.range?.end}
-        scenarioId="mobile-wheel"
-        validationResult={validationResult}
-      />
     </div>
   )
 }

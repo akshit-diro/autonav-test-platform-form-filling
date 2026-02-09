@@ -1,5 +1,4 @@
-export { RangeInspector } from './RangeInspector'
-export type { RangeInspectorProps } from './RangeInspector'
+export { DashboardNav } from './DashboardNav'
 export { SimpleCalendar } from './SimpleCalendar'
 export type { SimpleCalendarProps } from './SimpleCalendar'
 export { CalendarPopover } from './CalendarPopover'

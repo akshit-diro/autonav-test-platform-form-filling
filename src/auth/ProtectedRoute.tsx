@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from './useAuth'
+import { InactivityGuard } from './InactivityGuard'
 
 interface ProtectedRouteProps {
   /** If set, user must have this scenario in allowedScenarios or they see NotAuthorized. */
@@ -26,5 +27,6 @@ export function ProtectedRoute({ requiredScenario, children }: ProtectedRoutePro
     return <Navigate to="/not-authorized" replace />
   }
 
-  return children ?? <Outlet />
+  const content = children ?? <Outlet />
+  return <InactivityGuard>{content}</InactivityGuard>
 }

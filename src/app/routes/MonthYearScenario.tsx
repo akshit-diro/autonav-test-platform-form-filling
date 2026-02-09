@@ -1,10 +1,12 @@
 import { useMemo, useState, useEffect } from 'react'
 import { startOfMonth, endOfMonth } from 'date-fns'
-import { RangeInspector } from '../../components/RangeInspector'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { stressConfig } from '../../config/stressConfig'
+import { UX_DELAYS } from '../../config/uxDelays'
 import { validateRange } from '../../utils/date-range'
 import { generateDateRangeReport, downloadPdf } from '../../utils/pdfReport'
+import { delay } from '../../utils/delay'
+import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 
 const MONTH_LABELS = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -25,6 +27,8 @@ export function MonthYearScenario() {
   const [selectedYear, setSelectedYear] = useState<number | ''>('')
   const [selectedMonth, setSelectedMonth] = useState<number | ''>('')
   const [downloadReady, setDownloadReady] = useState(false)
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+  const isCooldown = useDownloadCooldown([selectedYear, selectedMonth])
 
   const range = useMemo(() => {
     if (selectedYear === '' || selectedMonth === '') return null
@@ -60,7 +64,11 @@ export function MonthYearScenario() {
     return () => clearTimeout(t)
   }, [valid])
 
-  const downloadEnabled = valid && (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
+  const downloadEnabled =
+    valid &&
+    !isCooldown &&
+    !generatingPdf &&
+    (!stressConfig.loadingSpinnerBeforeDownload || downloadReady)
 
   return (
     <div>
@@ -104,7 +112,7 @@ export function MonthYearScenario() {
           role="alert"
           data-testid="validation-errors"
           data-validation-errors={validationResult.errorCodes}
-          style={{ fontSize: '0.875rem', color: '#b00', marginBottom: '0.5rem' }}
+          className="form-error"
         >
           {validationResult.errors.map((e) => (
             <div key={e.code} data-testid={`validation-error-${e.code}`}>
@@ -123,23 +131,25 @@ export function MonthYearScenario() {
           data-validation-errors={validationResult.errorCodes || undefined}
           onClick={async () => {
             if (!downloadEnabled || !resolvedStart || !resolvedEnd) return
-            const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
-            downloadPdf(bytes)
+            setGeneratingPdf(true)
+            await delay(UX_DELAYS.SPINNER_BEFORE_PDF_MS)
+            try {
+              const bytes = await generateDateRangeReport(resolvedStart, resolvedEnd)
+              downloadPdf(bytes)
+            } finally {
+              setGeneratingPdf(false)
+            }
           }}
         >
           Download PDF
         </button>
         <LoadingSpinner
-          visible={valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady}
+          visible={
+            generatingPdf ||
+            (valid && stressConfig.loadingSpinnerBeforeDownload && !downloadReady)
+          }
         />
       </span>
-
-      <RangeInspector
-        resolvedStart={resolvedStart ?? undefined}
-        resolvedEnd={resolvedEnd ?? undefined}
-        scenarioId="month-year"
-        validationResult={validationResult}
-      />
     </div>
   )
 }

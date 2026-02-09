@@ -47,6 +47,16 @@ export const routes: RouteObject[] = [
     ],
   },
   {
+    path: '/statements/:picker/:baseScenario',
+    element: <ScenarioRouteGuard />,
+    children: [
+      {
+        index: true,
+        element: <ScenarioPage />,
+      },
+    ],
+  },
+  {
     path: '/statements/:scenarioId',
     element: <ScenarioRouteGuard />,
     children: [

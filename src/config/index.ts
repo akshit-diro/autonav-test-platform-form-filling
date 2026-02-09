@@ -1,5 +1,13 @@
-export { scenarioMatrix, scenarioIds, getScenario } from './scenarioMatrix'
-export type { ScenarioEntry } from './scenarioMatrix'
+export {
+  scenarioMatrix,
+  scenarioVariantMatrix,
+  scenarioIds,
+  allScenarioIds,
+  getScenario,
+  getScenarioIdFromRoute,
+  PICKER_REGISTRY,
+} from './scenarioMatrix'
+export type { ScenarioEntry, ScenarioMetadata, ScenarioAuth } from './scenarioMatrix'
 export { appConfig } from './appConfig'
 export type { AppConfig } from './appConfig'
 export { stressConfig } from './stressConfig'

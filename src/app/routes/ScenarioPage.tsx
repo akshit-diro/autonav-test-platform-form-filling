@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getScenario } from '../../config/scenarioMatrix'
+import { getScenario, getScenarioIdFromRoute } from '../../config/scenarioMatrix'
 import { LoadingSpinner } from '../../components/LoadingSpinner'
 import { appConfig } from '../../config/appConfig'
 import { stressConfig } from '../../config/stressConfig'
@@ -15,6 +15,8 @@ import { chaosDelay, chaosPick, chaosShuffled } from '../../utils/chaos'
 import { useAuth } from '../../auth/useAuth'
 import { useDownloadCooldown } from '../../utils/useDownloadCooldown'
 import { useFocusResetOnError } from '../../utils/useFocusResetOnError'
+import { runPickerScenario } from '../../scenario-engine'
+import type { ExecutionResult } from '../../scenario-engine'
 import { PresetsScenario } from './PresetsScenario'
 import { FromToScenario } from './FromToScenario'
 import { DualCalendarScenario } from './DualCalendarScenario'
@@ -203,8 +205,16 @@ function GenericScenarioContent() {
 }
 
 export function ScenarioPage() {
-  const { scenarioId } = useParams<{ scenarioId: string }>()
-  const scenario = scenarioId ? getScenario(scenarioId) : undefined
+  const { scenarioId: paramScenarioId, picker, baseScenario } = useParams<{
+    scenarioId?: string
+    picker?: string
+    baseScenario?: string
+  }>()
+  const effectiveScenarioId =
+    picker != null && baseScenario != null
+      ? getScenarioIdFromRoute(picker, baseScenario)
+      : paramScenarioId ?? undefined
+  const scenario = effectiveScenarioId ? getScenario(effectiveScenarioId) : undefined
 
   if (!scenario) {
     return (
@@ -215,12 +225,13 @@ export function ScenarioPage() {
     )
   }
 
-  const isPresets = scenarioId === 'presets'
-  const isFromTo = scenarioId === 'from-to'
-  const isDualCalendar = scenarioId === 'dual-calendar'
-  const isMonthYear = scenarioId === 'month-year'
-  const isYearOnly = scenarioId === 'year-only'
-  const isInlineCalendar = scenarioId === 'inline-calendar'
+  const isPresets = effectiveScenarioId === 'presets'
+  const isFromTo = effectiveScenarioId === 'from-to'
+  const isDualCalendar = effectiveScenarioId === 'dual-calendar'
+  const isMonthYear = effectiveScenarioId === 'month-year'
+  const isYearOnly = effectiveScenarioId === 'year-only'
+  const isInlineCalendar = effectiveScenarioId === 'inline-calendar'
+  const isPickerVariant = Boolean(scenario.metadata?.pickerType)
 
   return (
     <div className="page page--statement">
@@ -238,9 +249,108 @@ export function ScenarioPage() {
         <GenericScenarioContent />
       )}
 
+      {isPickerVariant && effectiveScenarioId && (
+        <PickerFlowPanel scenarioId={effectiveScenarioId} />
+      )}
+
       <p>
         <Link to="/">Back to home</Link>
       </p>
     </div>
+  )
+}
+
+/** Panel to run picker flow and show structured logs (scenario → picker → strategy → outcome). */
+function PickerFlowPanel({ scenarioId }: { scenarioId: string }) {
+  const [result, setResult] = useState<ExecutionResult | null>(null)
+  const [running, setRunning] = useState(false)
+
+  function handleRun() {
+    setRunning(true)
+    setResult(null)
+    try {
+      const executionResult = runPickerScenario(scenarioId, { scope: document })
+      setResult(executionResult)
+    } finally {
+      setRunning(false)
+    }
+  }
+
+  return (
+    <section
+      className="picker-flow-panel"
+      aria-labelledby="picker-flow-heading"
+      data-testid="picker-flow-panel"
+      style={{
+        marginTop: '1.5rem',
+        padding: '1rem',
+        border: '1px solid var(--bank-border)',
+        borderRadius: 'var(--bank-radius)',
+        backgroundColor: 'var(--bank-bg-elevated)',
+      }}
+    >
+      <h2 id="picker-flow-heading" style={{ fontSize: '1rem', margin: '0 0 0.5rem 0' }}>
+        Picker flow
+      </h2>
+      <p style={{ fontSize: '0.875rem', color: 'var(--bank-text-muted)', margin: '0 0 0.75rem 0' }}>
+        Run detect → open → setDate → confirm → validate for this scenario.
+      </p>
+      <button
+        type="button"
+        onClick={handleRun}
+        disabled={running}
+        data-testid="picker-flow-run"
+      >
+        {running ? 'Running…' : 'Run picker flow'}
+      </button>
+
+      {result && (
+        <div data-testid="picker-flow-result" style={{ marginTop: '1rem' }}>
+          <div
+            data-testid="picker-flow-outcome"
+            data-success={result.success}
+            data-failure-reason={result.failureReason ?? undefined}
+            style={{
+              fontWeight: 600,
+              marginBottom: '0.5rem',
+              color: result.success ? 'var(--bank-text)' : 'var(--bank-error, #c00)',
+            }}
+            role="status"
+          >
+            {result.success ? 'Success' : `Failed: ${result.failureReason ?? 'unknown'}`}
+          </div>
+          {result.validation && (
+            <div data-testid="picker-flow-validation" style={{ fontSize: '0.8125rem', marginBottom: '0.5rem' }}>
+              Input updated: {result.validation.inputValueUpdated ? 'yes' : 'no'} · Model: {result.validation.modelUpdated ? 'yes' : 'no'} · Payload: {result.validation.payloadCorrect ? 'yes' : 'no'}
+              {result.validation.message && ` · ${result.validation.message}`}
+            </div>
+          )}
+          <ul
+            data-testid="picker-flow-logs"
+            aria-label="Step logs"
+            style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0,
+              fontSize: '0.8125rem',
+              fontFamily: 'monospace',
+            }}
+          >
+            {result.logs.map((log, i) => (
+              <li
+                key={i}
+                data-testid={`picker-flow-log-${log.strategy}`}
+                data-strategy={log.strategy}
+                data-outcome={log.outcome}
+                style={{ marginBottom: '0.25rem' }}
+              >
+                <span aria-hidden>{log.scenario}</span> → <span aria-hidden>{log.picker}</span> → <span aria-hidden>{log.strategy}</span> → <span aria-hidden>{log.outcome}</span>
+                {log.detail && ` (${log.detail})`}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
   )
 }

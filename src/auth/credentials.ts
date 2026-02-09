@@ -5,6 +5,7 @@
  */
 
 import type { DatePickerScenarioId } from './routing'
+import { allScenarioIds } from '../config/scenarioMatrix'
 
 export interface CredentialEntry {
   password: string
@@ -24,15 +25,7 @@ export type CredentialsMap = Record<string, CredentialEntry>
 export const credentials: CredentialsMap = {
   admin: {
     password: 'admin123',
-    allowedScenarios: [
-      'admin',
-      'presets',
-      'from-to',
-      'dual-calendar',
-      'month-year',
-      'year-only',
-      'inline-calendar',
-    ],
+    allowedScenarios: ['admin', ...allScenarioIds],
     defaultScenario: 'presets',
     scenarioAgnostic: true,
   },

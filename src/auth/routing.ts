@@ -4,6 +4,7 @@
  * - Statements: scenario-bound users go to /statements/<scenario>; scenario-agnostic go to /statements (picker).
  */
 
+import { getScenario } from '../config/scenarioMatrix'
 import { credentials } from './credentials'
 
 /** Date-picker scenario ids. Must match scenarioMatrix and route structure. */
@@ -54,9 +55,10 @@ export function getStatementsNavigationPath(username: string | null): string {
   return `${STATEMENTS_PATH_PREFIX}/${entry.defaultScenario}`
 }
 
-/** Builds the statements path for a scenario id. */
+/** Builds the statements path for a scenario id (base or variant). Uses scenario route when defined. */
 export function getStatementsPathForScenario(scenarioId: string): string {
-  return `${STATEMENTS_PATH_PREFIX}/${scenarioId}`
+  const scenario = getScenario(scenarioId)
+  return scenario?.route ?? `${STATEMENTS_PATH_PREFIX}/${scenarioId}`
 }
 
 /** @deprecated Use getStatementsNavigationPath for Statements link. Post-login uses getPostLoginLandingPath(). */

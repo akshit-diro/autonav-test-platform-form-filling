@@ -8,6 +8,13 @@ const FIXED_DATE = new Date('2020-01-01T00:00:00.000Z')
 /** Fake account info — fixed for deterministic output. */
 const FAKE_ACCOUNT = {
   holderName: 'Test Account Holder',
+  address: {
+    line1: '123 High Street',
+    line2: 'Flat 4',
+    city: 'London',
+    postcode: 'SW1A 1AA',
+    country: 'United Kingdom',
+  },
   accountNumber: '**** 4567',
   sortCode: '12-34-56',
   branch: 'Test Branch',
@@ -75,6 +82,9 @@ export async function generateDateRangeReport(start: Date, end: Date): Promise<U
 
   drawLine('Account details', { bold: true })
   drawLine(`Account holder: ${FAKE_ACCOUNT.holderName}`)
+  drawLine(`Address: ${FAKE_ACCOUNT.address.line1}, ${FAKE_ACCOUNT.address.line2}`)
+  drawLine(`${FAKE_ACCOUNT.address.city}, ${FAKE_ACCOUNT.address.postcode}`)
+  drawLine(FAKE_ACCOUNT.address.country)
   drawLine(`Account number: ${FAKE_ACCOUNT.accountNumber}`)
   drawLine(`Sort code: ${FAKE_ACCOUNT.sortCode}`)
   drawLine(`Branch: ${FAKE_ACCOUNT.branch}`)

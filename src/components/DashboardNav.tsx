@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
-import { getDefaultRedirectForUser } from '../auth/routing'
+import { getStatementsNavigationPath } from '../auth/routing'
 
 export function DashboardNav() {
   const { user } = useAuth()
-  const statementsTo = getDefaultRedirectForUser(user ?? null)
+  const statementsTo = getStatementsNavigationPath(user ?? null)
 
   const items = [
     { to: '/', label: 'Accounts', end: true },

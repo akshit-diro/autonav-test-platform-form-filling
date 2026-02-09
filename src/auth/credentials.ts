@@ -1,7 +1,7 @@
 /**
  * Hard-coded credentials for frontend-only auth (automation testing).
  * No hashing, no persistence beyond memory.
- * Each user maps to exactly one date-picker scenario (defaultScenario); post-login redirect is /statements/<scenario>.
+ * Post-login landing is always Accounts (/). Statements navigation is role- and scenario-aware.
  */
 
 import type { DatePickerScenarioId } from './routing'
@@ -10,8 +10,13 @@ export interface CredentialEntry {
   password: string
   /** Scenario ids this user may access. Must include defaultScenario. */
   allowedScenarios: string[]
-  /** The single date-picker scenario this user lands on after login. */
+  /** Default date-picker scenario (used when user is scenario-bound for Statements link). */
   defaultScenario: DatePickerScenarioId
+  /**
+   * When true: user is scenario-agnostic (admin, viewer, tester). Statements → picker page.
+   * When false/omitted: user is scenario-bound. Statements → direct to defaultScenario.
+   */
+  scenarioAgnostic?: boolean
 }
 
 export type CredentialsMap = Record<string, CredentialEntry>
@@ -21,16 +26,19 @@ export const credentials: CredentialsMap = {
     password: 'admin123',
     allowedScenarios: ['admin', 'presets'],
     defaultScenario: 'presets',
+    scenarioAgnostic: true,
   },
   viewer: {
     password: 'viewer123',
     allowedScenarios: ['from-to'],
     defaultScenario: 'from-to',
+    scenarioAgnostic: true,
   },
   tester: {
     password: 'tester123',
     allowedScenarios: ['dual-calendar'],
     defaultScenario: 'dual-calendar',
+    scenarioAgnostic: true,
   },
   presets: {
     password: 'presets123',

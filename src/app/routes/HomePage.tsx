@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../../auth/useAuth'
-import { getDefaultRedirectForUser } from '../../auth/routing'
+import { getStatementsNavigationPath } from '../../auth/routing'
 import { DashboardLayout } from '../../components/DashboardLayout'
 import { DomNoiseDecorativeIcon } from '../../components/DomNoise'
 
@@ -47,7 +47,7 @@ export function HomePage() {
 
       <section className="dashboard-cta" data-testid="dashboard-cta-statements">
         <Link
-          to={getDefaultRedirectForUser(user ?? null)}
+          to={getStatementsNavigationPath(user ?? null)}
           className="dashboard-cta__button"
           data-testid="link-to-statements"
         >

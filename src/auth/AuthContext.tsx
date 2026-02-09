@@ -9,7 +9,7 @@ import {
 import { appConfig } from '../config/appConfig'
 import { clearAll as clearStateLeakage } from '../utils/stateLeakage'
 import { credentials } from './credentials'
-import { getDefaultRedirectForUser } from './routing'
+import { getPostLoginLandingPath } from './routing'
 import { ReauthModal } from './ReauthModal'
 
 export interface AuthState {
@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (authFlowVariant === 'otp-simulated') {
       setPostLoginOtpRequired(true)
     }
-    return { success: true, defaultRedirect: getDefaultRedirectForUser(username) }
+    return { success: true, defaultRedirect: getPostLoginLandingPath() }
   }, [])
 
   const logout = useCallback(() => {

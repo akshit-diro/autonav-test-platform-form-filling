@@ -1,7 +1,7 @@
 import { RouteObject } from 'react-router-dom'
 import { ProtectedRoute } from '../../auth/ProtectedRoute'
 import { ScenarioRouteGuard } from '../../auth/ScenarioRouteGuard'
-import { RedirectToDefaultScenario } from '../../auth/RedirectToDefaultScenario'
+import { StatementsLanding } from '../../auth/StatementsLanding'
 import { HomePage } from './HomePage'
 import { LoginPage } from './LoginPage'
 import { NotAuthorizedPage } from './NotAuthorizedPage'
@@ -28,7 +28,7 @@ export const routes: RouteObject[] = [
       },
       {
         path: 'statements',
-        element: <RedirectToDefaultScenario />,
+        element: <StatementsLanding />,
       },
       {
         path: 'profile',

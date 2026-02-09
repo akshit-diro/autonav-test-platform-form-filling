@@ -233,9 +233,8 @@ export function ScenarioPage() {
       {isDualCalendar && <DualCalendarScenario />}
       {isMonthYear && <MonthYearScenario />}
       {isYearOnly && <YearOnlyScenario />}
-      {isMobileWheel && <MobileWheelScenario />}
       {isInlineCalendar && <InlineCalendarScenario />}
-      {!isPresets && !isFromTo && !isDualCalendar && !isMonthYear && !isYearOnly && !isMobileWheel && !isInlineCalendar && (
+      {!isPresets && !isFromTo && !isDualCalendar && !isMonthYear && !isYearOnly && !isInlineCalendar && (
         <GenericScenarioContent />
       )}
 

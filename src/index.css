@@ -614,7 +614,6 @@ body {
 /* Preset / action button groups */
 .bank-app [data-testid="preset-buttons"],
 .bank-app [data-testid="dual-calendar-container"],
-.bank-app [data-testid="mobile-wheel-picker"],
 .bank-app [data-testid="month-year-picker"],
 .bank-app [data-testid="fiscal-year-picker"] {
   margin-bottom: 1rem;

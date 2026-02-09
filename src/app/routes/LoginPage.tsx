@@ -8,7 +8,7 @@ import { getLastUsername, setLastUsername } from '../../utils/stateLeakage'
 import { delay } from '../../utils/delay'
 import { DomNoise, DomNoiseDecorativeIcon } from '../../components/DomNoise'
 
-function getAccessNote(username: string, entry: CredentialEntry): string {
+function getAccessNote(entry: CredentialEntry): string {
   if (entry.scenarioAgnostic) {
     const count = entry.allowedScenarios.filter((s) => s !== 'admin').length
     return `Scenario-agnostic; Statements → picker (${count} scenarios)`
@@ -19,7 +19,7 @@ function getAccessNote(username: string, entry: CredentialEntry): string {
 const credentialsList = Object.entries(credentials).map(([user, entry]) => ({
   username: user,
   password: entry.password,
-  accessNote: getAccessNote(user, entry),
+  accessNote: getAccessNote(entry),
 }))
 
 export function LoginPage() {

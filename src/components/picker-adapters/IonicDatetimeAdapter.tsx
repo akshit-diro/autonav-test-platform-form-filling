@@ -4,6 +4,12 @@ import type { PickerAdapterProps } from './types'
 
 // Do not import Ionic core/structure/typography CSS - they reset html/body and break the host page.
 // ion-datetime uses Shadow DOM and carries its own styles; setupIonicReact() is enough for the component to work.
+// Provide theme variables so the selected calendar day is visible (--ion-color-base is used inside shadow DOM).
+const ionDatetimeThemeVars: React.CSSProperties = {
+  ['--ion-color-base' as string]: 'var(--bank-primary, #0d5c2e)',
+  ['--ion-color-base-rgb' as string]: '13, 92, 46',
+  ['--ion-color-contrast' as string]: '#ffffff',
+}
 setupIonicReact()
 
 function dateToIsoDateString(d: Date): string {
@@ -107,6 +113,7 @@ export function IonicDatetimeAdapter({
             max={maxStr}
             showDefaultButtons={false}
             className="ion-datetime"
+            style={ionDatetimeThemeVars}
           />
         </div>
         <div style={singleCalendarStyle} data-testid="ionic-datetime-end-wrap">
@@ -123,6 +130,7 @@ export function IonicDatetimeAdapter({
             max={maxStr}
             showDefaultButtons={false}
             className="ion-datetime"
+            style={ionDatetimeThemeVars}
           />
         </div>
       </div>
@@ -142,6 +150,7 @@ export function IonicDatetimeAdapter({
           id={id ?? 'ionic-datetime-single'}
           data-testid="ionic-datetime-single"
           className="ion-datetime"
+          style={ionDatetimeThemeVars}
         />
       </div>
     )

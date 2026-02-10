@@ -1,7 +1,6 @@
 import { useRef, useEffect, useCallback } from 'react'
 import type { PickerAdapterProps } from './types'
 import { appConfig } from '../../config/appConfig'
-import { formatDate } from '../../config/dateLocale'
 
 /** Bootstrap-datepicker format: map app DATE_FORMAT to bootstrap format (dd, mm, yyyy). */
 const DATE_FORMAT_TO_BOOTSTRAP: Record<string, string> = {
@@ -48,12 +47,16 @@ export function BootstrapUXAdapter({
   const endRef = useRef<HTMLInputElement>(null)
   const onChangeRef = useRef(onChange)
   const modeRef = useRef(mode)
+  const startDateRef = useRef(startDate)
+  /** When true, changeDate was triggered by our setDate/clearDates; skip calling onChange to avoid update loop. */
+  const suppressChangeRef = useRef(false)
   onChangeRef.current = onChange
   modeRef.current = mode
+  startDateRef.current = startDate
 
   const onEndChange = useCallback((date: Date | null) => {
-    if (modeRef.current === 'range') onChangeRef.current(startDate, date)
-  }, [startDate])
+    if (modeRef.current === 'range') onChangeRef.current(startDateRef.current, date)
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -73,6 +76,10 @@ export function BootstrapUXAdapter({
         autoclose: true,
       })
       $start.on('changeDate', function (this: HTMLElement) {
+        if (suppressChangeRef.current) {
+          suppressChangeRef.current = false
+          return
+        }
         const d = $(this).datepicker('getDate') as Date | null
         const endEl = endRef.current
         const endVal = endEl && hasBootstrapDatepicker($(endEl)) ? ($(endEl).datepicker('getDate') as Date | null) : null
@@ -80,7 +87,10 @@ export function BootstrapUXAdapter({
         else onChangeRef.current(d, null)
       })
 
-      if (startDate) $start.datepicker('setDate', startDate)
+      if (startDate) {
+        suppressChangeRef.current = true
+        $start.datepicker('setDate', startDate)
+      }
     })
 
     return () => {
@@ -88,7 +98,8 @@ export function BootstrapUXAdapter({
       const el = startRef.current
       if (el) getBootstrapDatepickerJQuery().then(($) => { if (hasBootstrapDatepicker($(el))) $(el).datepicker('destroy') })
     }
-  }, [mode, disabled, minDate, maxDate, endDate, startDate])
+  // Do not include startDate or endDate: syncing/options are done in dedicated effects to avoid re-initing when user picks a date.
+  }, [mode, disabled, minDate, maxDate])
 
   useEffect(() => {
     if (mode !== 'range') return
@@ -104,16 +115,23 @@ export function BootstrapUXAdapter({
       $end.datepicker({
         format: bootstrapDateFormat,
         weekStart,
-        startDate: startDate ?? minDate ?? undefined,
+        startDate: startDateRef.current ?? minDate ?? undefined,
         endDate: maxDate ?? undefined,
         autoclose: true,
       })
       $end.on('changeDate', function (this: HTMLElement) {
+        if (suppressChangeRef.current) {
+          suppressChangeRef.current = false
+          return
+        }
         const d = $(this).datepicker('getDate') as Date | null
         onEndChange(d)
       })
 
-      if (endDate) $end.datepicker('setDate', endDate)
+      if (endDate) {
+        suppressChangeRef.current = true
+        $end.datepicker('setDate', endDate)
+      }
     })
 
     return () => {
@@ -121,15 +139,44 @@ export function BootstrapUXAdapter({
       const el = endRef.current
       if (el) getBootstrapDatepickerJQuery().then(($) => { if (hasBootstrapDatepicker($(el))) $(el).datepicker('destroy') })
     }
-  }, [mode, disabled, startDate, minDate, maxDate, onEndChange, endDate])
+  // Do not include startDate or endDate: use refs so picking end date does not re-run this effect and re-trigger changeDate.
+  }, [mode, disabled, minDate, maxDate])
+
+  // Update start picker's max (endDate) when endDate changes, without re-initing.
+  useEffect(() => {
+    if (mode !== 'range') return
+    getBootstrapDatepickerJQuery().then(($) => {
+      const startEl = startRef.current
+      if (!startEl || !hasBootstrapDatepicker($(startEl))) return
+      $(startEl).datepicker('setEndDate', endDate ?? maxDate ?? undefined)
+    })
+  }, [mode, endDate, maxDate])
+
+  // Update end picker's min (startDate) when startDate changes, without re-initing.
+  useEffect(() => {
+    if (mode !== 'range') return
+    getBootstrapDatepickerJQuery().then(($) => {
+      const endEl = endRef.current
+      if (!endEl || !hasBootstrapDatepicker($(endEl))) return
+      $(endEl).datepicker('setStartDate', startDate ?? minDate ?? undefined)
+    })
+  }, [mode, startDate, minDate])
 
   useEffect(() => {
     getBootstrapDatepickerJQuery().then(($) => {
       const startEl = startRef.current
-      if (startEl && hasBootstrapDatepicker($(startEl))) {
-        if (startDate) $(startEl).datepicker('setDate', startDate)
-        else $(startEl).datepicker('clearDates')
-      }
+      if (!startEl || !hasBootstrapDatepicker($(startEl))) return
+      const current = $(startEl).datepicker('getDate') as Date | null
+      const same =
+        startDate == null && current == null ||
+        (startDate != null && current != null &&
+          startDate.getFullYear() === current.getFullYear() &&
+          startDate.getMonth() === current.getMonth() &&
+          startDate.getDate() === current.getDate())
+      if (same) return
+      suppressChangeRef.current = true
+      if (startDate) $(startEl).datepicker('setDate', startDate)
+      else $(startEl).datepicker('clearDates')
     })
   }, [startDate])
 
@@ -137,10 +184,18 @@ export function BootstrapUXAdapter({
     if (mode !== 'range') return
     getBootstrapDatepickerJQuery().then(($) => {
       const endEl = endRef.current
-      if (endEl && hasBootstrapDatepicker($(endEl))) {
-        if (endDate) $(endEl).datepicker('setDate', endDate)
-        else $(endEl).datepicker('clearDates')
-      }
+      if (!endEl || !hasBootstrapDatepicker($(endEl))) return
+      const current = $(endEl).datepicker('getDate') as Date | null
+      const same =
+        endDate == null && current == null ||
+        (endDate != null && current != null &&
+          endDate.getFullYear() === current.getFullYear() &&
+          endDate.getMonth() === current.getMonth() &&
+          endDate.getDate() === current.getDate())
+      if (same) return
+      suppressChangeRef.current = true
+      if (endDate) $(endEl).datepicker('setDate', endDate)
+      else $(endEl).datepicker('clearDates')
     })
   }, [mode, endDate])
 
@@ -155,7 +210,6 @@ export function BootstrapUXAdapter({
             id={id}
             className="picker-adapter__input"
             placeholder="Start date"
-            value={startDate ? formatDate(startDate) : ''}
             data-provide="datepicker"
             data-testid="bootstrap-ux-datepicker-start"
             autoComplete="off"
@@ -167,7 +221,6 @@ export function BootstrapUXAdapter({
             readOnly
             className="picker-adapter__input"
             placeholder="End date"
-            value={endDate ? formatDate(endDate) : ''}
             data-provide="datepicker"
             data-testid="bootstrap-ux-datepicker-end"
             autoComplete="off"
@@ -186,7 +239,6 @@ export function BootstrapUXAdapter({
         readOnly
         id={id}
         className="picker-adapter__input"
-        value={startDate ? formatDate(startDate) : ''}
         data-provide="datepicker"
         data-testid="bootstrap-ux-datepicker-input"
         autoComplete="off"

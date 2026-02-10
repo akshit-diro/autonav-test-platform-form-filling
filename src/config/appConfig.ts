@@ -84,10 +84,6 @@ export interface AppConfig {
   loadingSpinnerBeforeDownload: boolean
   /** Stress: duration (ms) for the pre-download spinner. */
   loadingSpinnerDurationMs: number
-  /** Session: logout after this many ms of no activity. */
-  inactivityTimeoutMs: number
-  /** Session: show warning this many ms before logout. */
-  warningBeforeLogoutMs: number
   /** Session idle timeout (ms). Used by sessionConfig when set. */
   sessionIdleTimeoutMs: number
   /** Session warning before logout (ms). Used by sessionConfig when set. */
@@ -131,8 +127,6 @@ const DEFAULTS: AppConfig = {
   disabledDatesChangeAfterSelection: false,
   loadingSpinnerBeforeDownload: false,
   loadingSpinnerDurationMs: 1500,
-  inactivityTimeoutMs: 2 * 60 * 1000,
-  warningBeforeLogoutMs: 15 * 1000,
   sessionIdleTimeoutMs: 2 * 60 * 1000,
   sessionWarningMs: 15 * 1000,
   authFlowVariant: 'simple',
@@ -167,14 +161,6 @@ function loadAppConfig(): AppConfig {
     loadingSpinnerDurationMs: envNumber(
       'VITE_LOADING_SPINNER_DURATION_MS',
       DEFAULTS.loadingSpinnerDurationMs
-    ),
-    inactivityTimeoutMs: envNumber(
-      'VITE_INACTIVITY_TIMEOUT_MS',
-      DEFAULTS.inactivityTimeoutMs
-    ),
-    warningBeforeLogoutMs: envNumber(
-      'VITE_WARNING_BEFORE_LOGOUT_MS',
-      DEFAULTS.warningBeforeLogoutMs
     ),
     sessionIdleTimeoutMs: envNumber(
       'VITE_SESSION_IDLE_TIMEOUT_MS',

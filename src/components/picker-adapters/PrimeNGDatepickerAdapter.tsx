@@ -7,6 +7,10 @@ import 'primereact/resources/themes/lara-light-blue/theme.css'
 import 'primereact/resources/primereact.min.css'
 import 'primeicons/primeicons.css'
 
+/** Month nav icons via PrimeIcons font so they render reliably in the datepicker header. */
+const PREV_ICON = <span className="p-datepicker-prev-icon p-icon pi pi-chevron-left" aria-hidden />
+const NEXT_ICON = <span className="p-datepicker-next-icon p-icon pi pi-chevron-right" aria-hidden />
+
 /** Map app DATE_FORMAT to PrimeReact Calendar dateFormat (d, dd, m, mm, y, yy). */
 const DATE_FORMAT_TO_PRIMENG: Record<string, string> = {
   'DD/MM/YYYY': 'dd/mm/yy',
@@ -65,6 +69,8 @@ export function PrimeNGDatepickerAdapter({
                 dateFormat={dateFormat}
                 minDate={minDate ?? undefined}
                 maxDate={maxDate ?? undefined}
+                prevIcon={PREV_ICON}
+                nextIcon={NEXT_ICON}
                 data-testid="primeng-datepicker-start"
                 inputClassName="p-datepicker-input"
                 aria-label="Start date"
@@ -82,6 +88,8 @@ export function PrimeNGDatepickerAdapter({
                 dateFormat={dateFormat}
                 minDate={startDate ?? minDate ?? undefined}
                 maxDate={maxDate ?? undefined}
+                prevIcon={PREV_ICON}
+                nextIcon={NEXT_ICON}
                 data-testid="primeng-datepicker-end"
                 inputClassName="p-datepicker-input"
                 aria-label="End date"
@@ -101,6 +109,8 @@ export function PrimeNGDatepickerAdapter({
               dateFormat={dateFormat}
               minDate={minDate ?? undefined}
               maxDate={maxDate ?? undefined}
+              prevIcon={PREV_ICON}
+              nextIcon={NEXT_ICON}
               placeholder={placeholder ?? 'Select start and end date'}
               className="p-datepicker-input"
               inputClassName="p-datepicker-input"
@@ -123,6 +133,8 @@ export function PrimeNGDatepickerAdapter({
           dateFormat={dateFormat}
           minDate={minDate ?? undefined}
           maxDate={maxDate ?? undefined}
+          prevIcon={PREV_ICON}
+          nextIcon={NEXT_ICON}
           data-testid="primeng-datepicker-single"
           inputClassName="p-datepicker-input"
         />
@@ -141,6 +153,8 @@ export function PrimeNGDatepickerAdapter({
         dateFormat={dateFormat}
         minDate={minDate ?? undefined}
         maxDate={maxDate ?? undefined}
+        prevIcon={PREV_ICON}
+        nextIcon={NEXT_ICON}
         placeholder={placeholder ?? 'Select date'}
         className="p-datepicker-input"
         inputClassName="p-datepicker-input"

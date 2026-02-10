@@ -6,6 +6,55 @@ import { getDateLocale } from '../../config/dateLocale'
 import { getWeekStartsOn } from '../../config/dateLocale'
 import 'react-day-picker/style.css'
 
+/** Ensures nav chevrons and selected-day highlight work in both document and shadow/iframe. */
+const RDP_UI_FIX_STYLES = `
+.picker-adapter--react-day-picker .rdp-chevron {
+  width: 1.75rem;
+  height: 1.75rem;
+  min-width: 28px;
+  min-height: 28px;
+}
+.picker-adapter--react-day-picker .rdp-selected .rdp-day_button {
+  background-color: var(--rdp-accent-color, #2563eb);
+  color: white;
+}
+`.trim()
+
+/** Chevron icon with inline fill so it stays visible when CSS doesn't apply (e.g. shadow DOM). */
+function ChevronIcon({
+  size = 30,
+  orientation = 'left',
+  className,
+  disabled,
+}: {
+  size?: number
+  orientation?: 'left' | 'right' | 'up' | 'down'
+  className?: string
+  disabled?: boolean
+}) {
+  const fill = disabled ? 'currentColor' : 'currentColor'
+  const opacity = disabled ? 0.5 : 1
+  const points =
+    orientation === 'up'
+      ? '6.77 17 12.5 11.43 18.24 17 20 15.28 12.5 8 5 15.28'
+      : orientation === 'down'
+        ? '6.77 8 12.5 13.57 18.24 8 20 9.72 12.5 17 5 9.72'
+        : orientation === 'left'
+          ? '16 18.112 9.81111111 12 16 5.87733333 14.0888889 4 6 12 14.0888889 20'
+          : '8 18.112 14.18888889 12 8 5.87733333 9.91111111 4 18 12 9.91111111 20'
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      aria-hidden
+    >
+      <polygon points={points} style={{ fill, opacity }} />
+    </svg>
+  )
+}
+
 export function ReactDayPickerAdapter({
   mode,
   disabled = false,
@@ -62,6 +111,7 @@ export function ReactDayPickerAdapter({
         data-testid="picker-adapter-react-day-picker"
         id={id}
       >
+        <style>{RDP_UI_FIX_STYLES}</style>
         <DayPicker
           mode="range"
           required={false}
@@ -70,6 +120,7 @@ export function ReactDayPickerAdapter({
           locale={locale}
           weekStartsOn={weekStartsOn}
           disabled={disabledMatcher}
+          components={{ Chevron: ChevronIcon }}
         />
       </div>
     )
@@ -80,6 +131,7 @@ export function ReactDayPickerAdapter({
       data-testid="picker-adapter-react-day-picker"
       id={id}
     >
+      <style>{RDP_UI_FIX_STYLES}</style>
       <DayPicker
         mode="single"
         required={false}
@@ -88,6 +140,7 @@ export function ReactDayPickerAdapter({
         locale={locale}
         weekStartsOn={weekStartsOn}
         disabled={disabledMatcher}
+        components={{ Chevron: ChevronIcon }}
       />
     </div>
   )
